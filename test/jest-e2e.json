@@ -1,6 +1,9 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "moduleNameMapper": {
+    "@app/config": "<rootDir>../src/config"
+  },
+  "rootDir": "./",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
