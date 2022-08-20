@@ -6,5 +6,6 @@ export default registerAs('api', () => ({
 	port: env.get('API_PORT').required(true).asPortNumber(),
 	cors: {
 		origins: env.get('API_CORS_ORIGINS').default(['*']).asArray(),
+		headers: env.get('API_CORS_HEADERS').default(['*']).asArray(),
 	},
 }));
