@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/config": ["src/config"],
+      "@app/doc": ["src/doc/doc.js"],
       "@app/logger": ["src/logger"]
     }
   }
