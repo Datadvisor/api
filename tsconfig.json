@@ -18,8 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@app/*": ["src/*"],
       "@app/config": ["src/config"],
-      "@app/doc": ["src/doc/doc.js"],
+      "@app/doc": ["src/doc"],
       "@app/logger": ["src/logger"]
     }
   }
