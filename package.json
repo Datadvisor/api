@@ -72,8 +72,9 @@
     "typescript": "^4.3.5"
   },
   "_moduleAliases": {
+    "@app/*": "dist/*",
     "@app/config": "dist/config",
-    "@app/doc": "dist/doc/doc.js",
+    "@app/doc": "dist/doc",
     "@app/logger": "dist/logger"
   }
 }

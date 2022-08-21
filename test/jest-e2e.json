@@ -1,8 +1,9 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "moduleNameMapper": {
+    "@app/*": "<rootDir>../src/*",
     "@app/config": "<rootDir>../src/config",
-    "@app/doc": "<rootDir>../src/doc/doc.js",
+    "@app/doc": "<rootDir>../src/doc",
     "@app/logger": "<rootDir>../src/logger"
   },
   "rootDir": "./",
