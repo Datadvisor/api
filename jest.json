@@ -6,6 +6,7 @@
   ],
   "moduleNameMapper": {
     "@app/config": "<rootDir>/src/config",
+    "@app/doc": "<rootDir>/src/doc/doc.js",
     "@app/logger": "<rootDir>/src/logger"
   },
   "rootDir": ".",

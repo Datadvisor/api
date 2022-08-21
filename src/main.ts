@@ -5,8 +5,10 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as morgan from 'morgan';
+import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
+import Doc from '@app/doc';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -29,6 +31,8 @@ async function bootstrap() {
 	app.enableCors({ credentials: true, allowedHeaders: corsHeaders, origin: corsOrigins });
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+	SwaggerModule.setup('doc', app, SwaggerModule.createDocument(app, Doc));
 
 	const host = configService.get<string>('api.host');
 	const port = configService.get<number>('api.port');
