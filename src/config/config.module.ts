@@ -5,5 +5,6 @@ import apiConfig from './api.config';
 
 export const Config: DynamicModule = ConfigModule.forRoot({
 	cache: true,
+	isGlobal: true,
 	load: [apiConfig],
 });

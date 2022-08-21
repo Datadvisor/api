@@ -1,7 +1,8 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "moduleNameMapper": {
-    "@app/config": "<rootDir>../src/config"
+    "@app/config": "<rootDir>../src/config",
+    "@app/logger": "<rootDir>../src/logger"
   },
   "rootDir": "./",
   "testEnvironment": "node",
