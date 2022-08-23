@@ -45,6 +45,7 @@ export class PostgresService
 			this.logger.log(event.target);
 		});
 		await this.$connect();
+		this.logger.log('Postgres successfully connected');
 	}
 
 	async enableShutdownHooks(app: INestApplication): Promise<void> {
