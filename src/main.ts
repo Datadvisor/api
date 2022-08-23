@@ -9,6 +9,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import Doc from '@app/doc';
+import { PostgresService } from '@app/postgres';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -33,6 +34,10 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
 	SwaggerModule.setup('doc', app, SwaggerModule.createDocument(app, Doc));
+
+	const postgresService = app.get(PostgresService);
+
+	await postgresService.enableShutdownHooks(app);
 
 	const host = configService.get<string>('api.host');
 	const port = configService.get<number>('api.port');
