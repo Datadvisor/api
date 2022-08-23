@@ -29,7 +29,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests"
   },
   "dependencies": {
-    "@liaoliaots/nestjs-redis": "^9.0.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
@@ -44,6 +43,7 @@
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
     "nest-winston": "^1.7.0",
+    "nestjs-redis": "git+https://github.com/GyanendroKh/nestjs-redis.git",
     "redis": "^4.3.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
