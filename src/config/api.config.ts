@@ -12,4 +12,5 @@ export default registerAs('api', () => ({
 		combinedPath: env.get('API_LOGS_COMBINED_PATH').default('logs/combined.log').asString(),
 		errorPath: env.get('API_LOGS_ERROR_PATH').default('logs/error.log').asString(),
 	},
+	saltRounds: env.get('API_SALT_ROUNDS').default(10).asIntPositive(),
 }));
