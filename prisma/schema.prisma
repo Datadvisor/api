@@ -10,6 +10,18 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
-model Example {
-  id       String    @id @default(uuid())
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  lastName      String
+  firstName     String
+  email         String    @unique
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
