@@ -9,7 +9,7 @@
   "main": "src/main.ts",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "yarn db:generate && nest build",
     "start": "yarn db:generate && yarn db:migrate && nest start",
     "start:dev": "yarn db:generate && yarn db:migrate && nest start --watch",
     "start:debug": "yarn db:generate && yarn db:migrate && nest start --debug --watch",
