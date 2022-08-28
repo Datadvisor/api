@@ -13,4 +13,10 @@ export default registerAs('api', () => ({
 		errorPath: env.get('API_LOGS_ERROR_PATH').default('logs/error.log').asString(),
 	},
 	saltRounds: env.get('API_SALT_ROUNDS').default(10).asIntPositive(),
+	session: {
+		secret: env.get('API_SESSION_SECRET').required(true).asString(),
+		secure: env.get('API_SESSION_SECURE').default('false').asBool(),
+		httpOnly: env.get('API_SESSION_HTTP_ONLY').default('false').asBool(),
+		maxAge: env.get('API_SESSION_MAX_AGE').default(86400000).asIntPositive(),
+	},
 }));
