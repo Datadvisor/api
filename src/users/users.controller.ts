@@ -27,6 +27,7 @@ import { UsersService } from './users.service';
 import { UserRo } from './ro';
 import { User } from './entities';
 import { UpdateUserDto } from './dto';
+import { UserConflictException, UserNotFoundException } from './exceptions';
 
 @ApiTags('users')
 @Controller('users')
@@ -61,12 +62,13 @@ export class UsersController {
 	@Get(':id')
 	@HttpCode(HttpStatus.OK)
 	async getById(@Param('id') id: string): Promise<UserRo | null> {
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+		try {
+			return new UserRo(await this.usersService.getById(id));
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			}
 		}
-		return new UserRo(user);
 	}
 
 	@ApiOperation({ summary: 'Update user' })
@@ -78,17 +80,15 @@ export class UsersController {
 	@Patch(':id')
 	@HttpCode(HttpStatus.OK)
 	async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<UserRo | null> {
-		const { email } = payload;
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+		try {
+			return new UserRo(await this.usersService.update(id, payload));
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			} else if (err instanceof UserConflictException) {
+				throw new ConflictException(err.message);
+			}
 		}
-
-		if (email && (await this.usersService.getByEmail(email))) {
-			throw new ConflictException('Email address already associated to another user account');
-		}
-		return new UserRo(await this.usersService.update(id, payload));
 	}
 
 	@ApiOperation({ summary: 'Delete user' })
@@ -98,11 +98,12 @@ export class UsersController {
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async delete(@Param('id') id: string): Promise<void> {
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+		try {
+			await this.usersService.delete(id);
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			}
 		}
-		await this.usersService.delete(id);
 	}
 }

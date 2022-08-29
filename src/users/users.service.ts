@@ -5,13 +5,18 @@ import { hash } from 'bcrypt';
 import { PostgresService } from '../postgres';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities';
+import { UserNotFoundException } from './exceptions';
+import { UserConflictException } from './exceptions';
 
 @Injectable()
 export class UsersService {
 	constructor(private readonly configService: ConfigService, private postgres: PostgresService) {}
 
 	async create(payload: CreateUserDto): Promise<User> {
-		return this.postgres.user.create({ data: payload });
+		const { password } = payload;
+		const hashedPassword = await hash(password, this.configService.get<number>('api.saltRounds'));
+
+		return this.postgres.user.create({ data: { ...payload, password: hashedPassword } });
 	}
 
 	async getAll(): Promise<User[]> {
@@ -19,19 +24,37 @@ export class UsersService {
 	}
 
 	async getById(id: string): Promise<User | null> {
-		return this.postgres.user.findUnique({ where: { id } });
+		const user = await this.postgres.user.findUnique({ where: { id } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+		return user;
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
-		return this.postgres.user.findUnique({ where: { email } });
+		const user = await this.postgres.user.findUnique({ where: { email } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+		return user;
 	}
 
 	async update(id: string, payload: UpdateUserDto): Promise<User | null> {
-		const { password } = payload;
+		const { email, password } = payload;
 		const hashedPassword = password
-			? await hash(password, this.configService.get<number>('API_SALT_ROUNDS'))
+			? await hash(password, this.configService.get<number>('api.saltRounds'))
 			: undefined;
+		const user = await this.postgres.user.findUnique({ where: { id } });
 
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+
+		if (email && (await this.postgres.user.findUnique({ where: { email } }))) {
+			throw new UserConflictException('Email address already associated to another user account');
+		}
 		return this.postgres.user.update({
 			where: { id },
 			data: { ...payload, ...(hashedPassword ? { password: hashedPassword } : {}) },
@@ -39,6 +62,11 @@ export class UsersService {
 	}
 
 	async delete(id: string): Promise<User | null> {
+		const user = await this.postgres.user.findUnique({ where: { id } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
 		return this.postgres.user.delete({ where: { id } });
 	}
 }

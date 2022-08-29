@@ -26,7 +26,7 @@ export class UserRo {
 	@ApiProperty({ enum: Role })
 	role: Role;
 
-	@Exclude()
+	@ApiProperty()
 	updatedAt: Date;
 
 	@ApiProperty()
