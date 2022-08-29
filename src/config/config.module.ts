@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 
-import apiConfig from './api.config';
-import postgresConfig from './postgres.config';
-import redisConfig from './redis.config';
+import { apiConfig } from './api.config';
+import { postgresConfig } from './postgres.config';
+import { redisConfig } from './redis.config';
 
 @Module({
 	imports: [

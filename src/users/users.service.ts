@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 
-import { PostgresService } from '@app/postgres';
+import { PostgresService } from '../postgres';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {

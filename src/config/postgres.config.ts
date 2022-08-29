@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import * as env from 'env-var';
 
-export default registerAs('postgres', () => ({
+export const postgresConfig = registerAs('postgres', () => ({
 	url: env.get('POSTGRES_URL').required(true).asString(),
 }));

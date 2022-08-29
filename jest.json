@@ -4,9 +4,6 @@
     "json",
     "ts"
   ],
-  "moduleNameMapper": {
-    "@app/*": "<rootDir>/src/*"
-  },
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".*\\.spec\\.ts$",

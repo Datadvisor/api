@@ -1,1 +1,1 @@
-export * from './get-user.ro';
+export * from './user.ro';

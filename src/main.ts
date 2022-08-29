@@ -1,15 +1,12 @@
-import 'module-alias/register';
-
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as morgan from 'morgan';
-import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
-import Doc from '@app/doc';
-import { PostgresService } from '@app/postgres';
+import { doc } from './doc';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -33,11 +30,7 @@ async function bootstrap() {
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-	SwaggerModule.setup('doc', app, SwaggerModule.createDocument(app, Doc));
-
-	const postgresService = app.get(PostgresService);
-
-	await postgresService.enableShutdownHooks(app);
+	SwaggerModule.setup('doc', app, SwaggerModule.createDocument(app, doc));
 
 	const host = configService.get<string>('api.host');
 	const port = configService.get<number>('api.port');
