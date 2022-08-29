@@ -24,9 +24,10 @@ import {
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto';
+import { UserRo } from './ro';
 import { User } from './entities';
-import { GetUserRo } from './ro';
+import { UpdateUserDto } from './dto';
+import { UserConflictException, UserNotFoundException } from './exceptions';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,60 +36,59 @@ export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@ApiOperation({ summary: 'Get all users' })
-	@ApiOkResponse({ description: 'Success', type: [GetUserRo] })
+	@ApiOkResponse({ description: 'Success', type: [UserRo] })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get()
 	@HttpCode(HttpStatus.OK)
-	async getAll(): Promise<GetUserRo[]> {
+	async getAll(): Promise<UserRo[]> {
 		const users = await this.usersService.getAll();
 
-		return users.map((user) => new GetUserRo(user));
+		return users.map((user) => new UserRo(user));
 	}
 
 	@ApiOperation({ summary: 'Get current user' })
-	@ApiOkResponse({ description: 'Success', type: GetUserRo })
+	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get('/me')
 	@HttpCode(HttpStatus.OK)
-	async me(user: User): Promise<GetUserRo> {
-		return new GetUserRo(user);
+	async me(user: User): Promise<UserRo> {
+		return new UserRo(user);
 	}
 
 	@ApiOperation({ summary: 'Get a user by id' })
-	@ApiOkResponse({ description: 'Success', type: GetUserRo })
+	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get(':id')
 	@HttpCode(HttpStatus.OK)
-	async getById(@Param('id') id: string): Promise<GetUserRo | null> {
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+	async getById(@Param('id') id: string): Promise<UserRo | null> {
+		try {
+			return new UserRo(await this.usersService.getById(id));
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			}
 		}
-		return new GetUserRo(user);
 	}
 
 	@ApiOperation({ summary: 'Update user' })
-	@ApiOkResponse({ description: 'Success', type: GetUserRo })
+	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiConflictResponse({ description: 'Conflict' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Patch(':id')
 	@HttpCode(HttpStatus.OK)
-	async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<GetUserRo | null> {
-		const { email } = payload;
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+	async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<UserRo | null> {
+		try {
+			return new UserRo(await this.usersService.update(id, payload));
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			} else if (err instanceof UserConflictException) {
+				throw new ConflictException(err.message);
+			}
 		}
-
-		if (email && (await this.usersService.getByEmail(email))) {
-			throw new ConflictException('Email address already associated to another user account');
-		}
-		return new GetUserRo(await this.usersService.update(id, payload));
 	}
 
 	@ApiOperation({ summary: 'Delete user' })
@@ -98,11 +98,12 @@ export class UsersController {
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async delete(@Param('id') id: string): Promise<void> {
-		const user = await this.usersService.getById(id);
-
-		if (!user) {
-			throw new NotFoundException('User not found');
+		try {
+			await this.usersService.delete(id);
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			}
 		}
-		await this.usersService.delete(id);
 	}
 }

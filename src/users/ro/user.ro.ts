@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-import { User, Role } from '../entities';
 import { Exclude } from 'class-transformer';
 
-export class GetUserRo {
+import { User, Role } from '../entities';
+
+export class UserRo {
 	constructor(partial: Partial<User> = {}) {
 		Object.assign(this, partial);
 	}
@@ -26,7 +26,7 @@ export class GetUserRo {
 	@ApiProperty({ enum: Role })
 	role: Role;
 
-	@Exclude()
+	@ApiProperty()
 	updatedAt: Date;
 
 	@ApiProperty()
