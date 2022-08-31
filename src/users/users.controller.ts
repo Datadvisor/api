@@ -15,19 +15,23 @@ import {
 import {
 	ApiBadRequestResponse,
 	ApiConflictResponse,
+	ApiForbiddenResponse,
 	ApiInternalServerErrorResponse,
 	ApiNoContentResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
 	ApiTags,
+	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
+import { AuthOwner, AuthUser } from '../auth/decorators';
 import { UserRo } from './ro';
-import { User } from './entities';
-import { UpdateUserDto } from './dto';
+import { Role, User } from './entities';
+import { CurrentUser } from './decorators';
 import { UserConflictException, UserNotFoundException } from './exceptions';
+import { UpdateUserDto } from './dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -37,8 +41,11 @@ export class UsersController {
 
 	@ApiOperation({ summary: 'Get all users' })
 	@ApiOkResponse({ description: 'Success', type: [UserRo] })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get()
+	@AuthUser(Role.ADMIN)
 	@HttpCode(HttpStatus.OK)
 	async getAll(): Promise<UserRo[]> {
 		const users = await this.usersService.getAll();
@@ -48,18 +55,23 @@ export class UsersController {
 
 	@ApiOperation({ summary: 'Get current user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get('/me')
+	@AuthUser()
 	@HttpCode(HttpStatus.OK)
-	async me(user: User): Promise<UserRo> {
+	async me(@CurrentUser() user: User): Promise<UserRo> {
 		return new UserRo(user);
 	}
 
-	@ApiOperation({ summary: 'Get a user by id' })
+	@ApiOperation({ summary: 'Get user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get(':id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.OK)
 	async getById(@Param('id') id: string): Promise<UserRo | null> {
 		try {
@@ -68,16 +80,20 @@ export class UsersController {
 			if (err instanceof UserNotFoundException) {
 				throw new NotFoundException(err.message);
 			}
+			throw err;
 		}
 	}
 
 	@ApiOperation({ summary: 'Update user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiBadRequestResponse({ description: 'Bad request' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiConflictResponse({ description: 'Conflict' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Patch(':id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.OK)
 	async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<UserRo | null> {
 		try {
@@ -88,14 +104,18 @@ export class UsersController {
 			} else if (err instanceof UserConflictException) {
 				throw new ConflictException(err.message);
 			}
+			throw err;
 		}
 	}
 
 	@ApiOperation({ summary: 'Delete user' })
 	@ApiNoContentResponse({ description: 'Success' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Delete(':id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async delete(@Param('id') id: string): Promise<void> {
 		try {
@@ -104,6 +124,7 @@ export class UsersController {
 			if (err instanceof UserNotFoundException) {
 				throw new NotFoundException(err.message);
 			}
+			throw err;
 		}
 	}
 }

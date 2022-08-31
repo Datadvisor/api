@@ -5,17 +5,19 @@ import { hash } from 'bcrypt';
 import { PostgresService } from '../postgres';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities';
-import { UserNotFoundException } from './exceptions';
-import { UserConflictException } from './exceptions';
+import { UserNotFoundException, UserConflictException } from './exceptions';
 
 @Injectable()
 export class UsersService {
 	constructor(private readonly configService: ConfigService, private postgres: PostgresService) {}
 
 	async create(payload: CreateUserDto): Promise<User> {
-		const { password } = payload;
+		const { email, password } = payload;
 		const hashedPassword = await hash(password, this.configService.get<number>('api.saltRounds'));
 
+		if (await this.postgres.user.findUnique({ where: { email } })) {
+			throw new UserConflictException('Email address already associated to another user account');
+		}
 		return this.postgres.user.create({ data: { ...payload, password: hashedPassword } });
 	}
 
