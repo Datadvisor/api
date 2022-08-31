@@ -28,8 +28,7 @@ import {
 import { UsersService } from './users.service';
 import { AuthOwner, AuthUser } from '../auth/decorators';
 import { UserRo } from './ro';
-import { Role, User } from './entities';
-import { CurrentUser } from './decorators';
+import { Role } from './entities';
 import { UserConflictException, UserNotFoundException } from './exceptions';
 import { UpdateUserDto } from './dto';
 
@@ -51,17 +50,6 @@ export class UsersController {
 		const users = await this.usersService.getAll();
 
 		return users.map((user) => new UserRo(user));
-	}
-
-	@ApiOperation({ summary: 'Get current user' })
-	@ApiOkResponse({ description: 'Success', type: UserRo })
-	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
-	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
-	@Get('/me')
-	@AuthUser()
-	@HttpCode(HttpStatus.OK)
-	async me(@CurrentUser() user: User): Promise<UserRo> {
-		return new UserRo(user);
 	}
 
 	@ApiOperation({ summary: 'Get user' })
