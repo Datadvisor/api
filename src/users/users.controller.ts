@@ -26,7 +26,7 @@ import {
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
-import { AuthUser } from '../auth/decorators';
+import { AuthOwner, AuthUser } from '../auth/decorators';
 import { UserRo } from './ro';
 import { Role, User } from './entities';
 import { CurrentUser } from './decorators';
@@ -45,7 +45,7 @@ export class UsersController {
 	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get()
-	@AuthUser(undefined, Role.ADMIN)
+	@AuthUser(Role.ADMIN)
 	@HttpCode(HttpStatus.OK)
 	async getAll(): Promise<UserRo[]> {
 		const users = await this.usersService.getAll();
@@ -71,7 +71,7 @@ export class UsersController {
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get(':id')
-	@AuthUser('id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.OK)
 	async getById(@Param('id') id: string): Promise<UserRo | null> {
 		try {
@@ -93,7 +93,7 @@ export class UsersController {
 	@ApiConflictResponse({ description: 'Conflict' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Patch(':id')
-	@AuthUser('id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.OK)
 	async update(@Param('id') id: string, @Body() payload: UpdateUserDto): Promise<UserRo | null> {
 		try {
@@ -115,7 +115,7 @@ export class UsersController {
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Delete(':id')
-	@AuthUser('id')
+	@AuthOwner()
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async delete(@Param('id') id: string): Promise<void> {
 		try {
