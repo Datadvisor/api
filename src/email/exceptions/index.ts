@@ -1,1 +1,1 @@
-export * from './EmailSendException';
+export * from './email-send.exception';
