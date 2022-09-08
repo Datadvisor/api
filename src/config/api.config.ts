@@ -19,4 +19,13 @@ export const apiConfig = registerAs('api', () => ({
 		httpOnly: env.get('API_SESSION_HTTP_ONLY').default('false').asBool(),
 		maxAge: env.get('API_SESSION_MAX_AGE').default(86400000).asIntPositive(),
 	},
+	contact: {
+		emailTemplatePath: env
+			.get('API_CONTACT_EMAIL_TEMPLATE_PATH')
+			.default('views/contact-email.template.ejs')
+			.asString(),
+		senderName: env.get('API_CONTACT_SENDER_NAME').required(true).asString(),
+		senderEmail: env.get('API_CONTACT_SENDER_EMAIL').required(true).asString(),
+		recipientEmail: env.get('API_CONTACT_RECIPIENT_EMAIL').required(true).asString(),
+	},
 }));
