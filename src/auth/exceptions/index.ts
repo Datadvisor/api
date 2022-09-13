@@ -1,1 +1,1 @@
-export * from './auth-unauthorized.exception';
+export * from './unauthorized-auth.exception';

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, InternalServerErrorException, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,
@@ -7,9 +7,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 
-import { EmailSendException } from '../email/exceptions';
-import { SendContactFormDto } from './dto';
-import { ContactEmailRenderException } from './exceptions';
+import { SendContactRequestDto } from './dto';
 import { ContactService } from './contact.service';
 
 @ApiTags('contact')
@@ -23,14 +21,7 @@ export class ContactController {
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Post()
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async send(@Body() payload: SendContactFormDto): Promise<void> {
-		try {
-			await this.contactService.send(payload);
-		} catch (err) {
-			if (err instanceof ContactEmailRenderException || err instanceof EmailSendException) {
-				throw new InternalServerErrorException();
-			}
-			throw err;
-		}
+	async send(@Body() payload: SendContactRequestDto): Promise<void> {
+		await this.contactService.send(payload);
 	}
 }

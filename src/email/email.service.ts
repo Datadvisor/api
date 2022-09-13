@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import * as SendGrid from '@sendgrid/mail';
 
 import { SendEmailDto } from './dto';
-import { EmailSendException } from './exceptions';
 
 @Injectable()
 export class EmailService {
@@ -18,7 +17,7 @@ export class EmailService {
 			await SendGrid.send(payload);
 		} catch (err) {
 			this.logger.error(err.message);
-			throw new EmailSendException('Cannot send email');
+			throw err;
 		}
 	}
 }
