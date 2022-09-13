@@ -6,5 +6,6 @@ export const doc = new DocumentBuilder()
 	.setVersion('1.0.0')
 	.addTag('auth', 'Auth module')
 	.addTag('contact', 'Contact module')
+	.addTag('email-confirmation', 'Email confirmation module')
 	.addTag('users', 'Users module')
 	.build();

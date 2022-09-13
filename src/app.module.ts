@@ -4,6 +4,7 @@ import { AuthModule } from './auth';
 import { ConfigModule } from './config';
 import { ContactModule } from './contact';
 import { EmailModule } from './email';
+import { EmailConfirmationModule } from './email-confirmation';
 import { LoggerModule } from './logger';
 import { PostgresModule } from './postgres';
 import { RedisModule } from './redis';
@@ -16,6 +17,7 @@ import { UsersModule } from './users';
 		ConfigModule,
 		ContactModule,
 		EmailModule,
+		EmailConfirmationModule,
 		LoggerModule,
 		PostgresModule,
 		RedisModule,
