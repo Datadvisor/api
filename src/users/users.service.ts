@@ -1,15 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 
 import { PostgresService } from '../postgres';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { User } from './entities';
+import { User, Role } from './entities';
 import { UserNotFoundException, UserConflictException } from './exceptions';
+import { EmailConfirmationService } from '../email-confirmation';
 
 @Injectable()
 export class UsersService {
-	constructor(private readonly configService: ConfigService, private postgres: PostgresService) {}
+	constructor(
+		private readonly configService: ConfigService,
+		private postgres: PostgresService,
+		@Inject(forwardRef(() => EmailConfirmationService))
+		private readonly emailConfirmationService: EmailConfirmationService,
+	) {}
 
 	async create(payload: CreateUserDto): Promise<User> {
 		const { email, password } = payload;
@@ -18,7 +24,13 @@ export class UsersService {
 		if (await this.postgres.user.findUnique({ where: { email } })) {
 			throw new UserConflictException('Email address already associated to another user account');
 		}
-		return this.postgres.user.create({ data: { ...payload, password: hashedPassword } });
+
+		const user = await this.postgres.user.create({ data: { ...payload, password: hashedPassword } });
+
+		try {
+			await this.emailConfirmationService.send(email);
+		} catch (err) {}
+		return user;
 	}
 
 	async getAll(): Promise<User[]> {
@@ -60,6 +72,18 @@ export class UsersService {
 		return this.postgres.user.update({
 			where: { id },
 			data: { ...payload, ...(hashedPassword ? { password: hashedPassword } : {}) },
+		});
+	}
+
+	async updateRole(id: string, role: Role): Promise<void> {
+		const user = await this.postgres.user.findUnique({ where: { id } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+		await this.postgres.user.update({
+			data: { role },
+			where: { id },
 		});
 	}
 
