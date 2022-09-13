@@ -26,7 +26,7 @@ import { AuthService } from './auth.service';
 import { SigninDto, SignupDto } from './dto';
 import { UserRo } from '../users/ro';
 import { UserConflictException, UserNotFoundException } from '../users/exceptions';
-import { AuthUnauthorizedException } from './exceptions';
+import { UnauthorizedAuthException } from './exceptions';
 import { AuthUser } from './decorators';
 import { ISession } from '../session';
 
@@ -69,7 +69,7 @@ export class AuthController {
 			session.save();
 			return new UserRo(user);
 		} catch (err) {
-			if (err instanceof UserNotFoundException || err instanceof AuthUnauthorizedException) {
+			if (err instanceof UserNotFoundException || err instanceof UnauthorizedAuthException) {
 				throw new UnauthorizedException('Invalid username or password');
 			}
 			throw err;

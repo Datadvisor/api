@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
-export class SendContactFormDto {
+export class SendContactRequestDto {
 	@ApiProperty()
 	@IsString()
 	lastName: string;

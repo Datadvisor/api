@@ -5,7 +5,7 @@ import { UsersService } from '../users';
 import { SignupDto } from './dto';
 import { SigninDto } from './dto';
 import { User } from '../users/entities';
-import { AuthUnauthorizedException } from './exceptions';
+import { UnauthorizedAuthException } from './exceptions';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
 		const user = await this.userService.getByEmail(email);
 
 		if (!(await compare(password, user.password))) {
-			throw new AuthUnauthorizedException('Invalid username or password');
+			throw new UnauthorizedAuthException('Invalid username or password');
 		}
 		return user;
 	}
