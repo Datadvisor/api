@@ -45,7 +45,7 @@ export class EmailConfirmationService {
 		});
 	}
 
-	async verify(token: string): Promise<void> {
+	async confirm(token: string): Promise<void> {
 		try {
 			const { email } = await this.jwtService.verifyAsync<EmailConfirmationTokenPayloadType>(token);
 			const user = await this.usersService.getByEmail(email);
