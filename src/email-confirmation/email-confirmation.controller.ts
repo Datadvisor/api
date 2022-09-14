@@ -12,12 +12,11 @@ import {
 	BadRequestException,
 	ConflictException,
 	Controller,
-	Get,
 	GoneException,
 	HttpCode,
 	HttpStatus,
+	Param,
 	Post,
-	Query,
 } from '@nestjs/common';
 
 import { EmailConfirmationService } from './email-confirmation.service';
@@ -31,10 +30,9 @@ import { EmailAlreadyConfirmedException, InvalidTokenException } from './excepti
 export class EmailConfirmationController {
 	constructor(private readonly emailConfirmationService: EmailConfirmationService) {}
 
-	@ApiOperation({ summary: 'Send an email to validate user email' })
+	@ApiOperation({ summary: 'Send an email to confirm user email' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
-	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiConflictResponse({ description: 'Conflict' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Post()
@@ -51,16 +49,16 @@ export class EmailConfirmationController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Verify user email' })
+	@ApiOperation({ summary: 'Confirm user email' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiGoneResponse({ description: 'Gone' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
-	@Get('verify')
+	@Post('confirm/:token')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async verify(@Query('token') token: string): Promise<void> {
+	async confirm(@Param('token') token: string): Promise<void> {
 		try {
-			await this.emailConfirmationService.verify(token);
+			await this.emailConfirmationService.confirm(token);
 		} catch (err) {
 			if (err instanceof EmailAlreadyConfirmedException) {
 				throw new GoneException(err.message);
