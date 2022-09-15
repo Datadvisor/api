@@ -56,9 +56,8 @@ export class UsersService {
 	}
 
 	async update(id: string, payload: UpdateUserDto): Promise<User | null> {
-		const { email, password } = payload;
-		const hashedPassword = password
-			? await hash(password, this.configService.get<number>('api.saltRounds'))
+		const hashedPassword = payload.password
+			? await hash(payload.password, this.configService.get<number>('api.saltRounds'))
 			: undefined;
 		const user = await this.postgres.user.findUnique({ where: { id } });
 
@@ -66,7 +65,7 @@ export class UsersService {
 			throw new UserNotFoundException('User not found');
 		}
 
-		if (email && (await this.postgres.user.findUnique({ where: { email } }))) {
+		if (payload.email && (await this.postgres.user.findUnique({ where: { email: payload.email } }))) {
 			throw new UserConflictException('Email address already associated to another user account');
 		}
 		return this.postgres.user.update({
