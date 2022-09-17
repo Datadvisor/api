@@ -2,7 +2,6 @@ import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,
 	ApiNoContentResponse,
-	ApiNotFoundResponse,
 	ApiOperation,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -21,7 +20,6 @@ export class ResetPasswordController {
 	@ApiOperation({ summary: 'Send an email to reset user password' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiBadRequestResponse({ description: 'Bad request' })
-	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Post()
 	@HttpCode(HttpStatus.NO_CONTENT)

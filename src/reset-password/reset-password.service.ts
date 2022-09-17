@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import * as ejs from 'ejs';
 import * as path from 'path';
 
@@ -9,7 +10,6 @@ import { UsersService } from '../users';
 import { ResetPasswordDto, SendResetPasswordEmailDto } from './dto';
 import { ResetPasswordTokenPayloadType } from './reset-password.type';
 import { InvalidTokenException } from './exceptions';
-import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 
 @Injectable()
 export class ResetPasswordService {
