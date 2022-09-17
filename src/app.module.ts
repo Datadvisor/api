@@ -8,6 +8,7 @@ import { EmailConfirmationModule } from './email-confirmation';
 import { LoggerModule } from './logger';
 import { PostgresModule } from './postgres';
 import { RedisModule } from './redis';
+import { ResetPasswordModule } from './reset-password';
 import { SessionModule } from './session';
 import { UsersModule } from './users';
 
@@ -21,6 +22,7 @@ import { UsersModule } from './users';
 		LoggerModule,
 		PostgresModule,
 		RedisModule,
+		ResetPasswordModule,
 		SessionModule,
 		UsersModule,
 	],

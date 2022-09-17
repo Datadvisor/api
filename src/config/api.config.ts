@@ -35,6 +35,14 @@ export const apiConfig = registerAs('api', () => ({
 		combinedPath: env.get('API_LOGS_COMBINED_PATH').default('logs/combined.log').asString(),
 		errorPath: env.get('API_LOGS_ERROR_PATH').default('logs/error.log').asString(),
 	},
+	'reset-password': {
+		emailTemplatePath: env
+			.get('API_RESET_PASSWORD_EMAIL_TEMPLATE_PATH')
+			.default('views/reset-password-email.view.ejs')
+			.asString(),
+		jwtSecret: env.get('API_RESET_PASSWORD_JWT_SECRET').required(true).asString(),
+		jwtExpirationTime: env.get('API_RESET_PASSWORD_JWT_EXPIRATION_TIME').default('60m').asString(),
+	},
 	session: {
 		secret: env.get('API_SESSION_SECRET').required(true).asString(),
 		secure: env.get('API_SESSION_SECURE').default('false').asBool(),
