@@ -4,13 +4,13 @@ import * as ejs from 'ejs';
 import * as path from 'path';
 
 import { EmailService } from '../email';
-import { SendContactRequestDto } from './dto';
+import { SendContactEmailDto } from './dto';
 
 @Injectable()
 export class ContactService {
 	constructor(private readonly configService: ConfigService, private readonly emailService: EmailService) {}
 
-	async send(payload: SendContactRequestDto) {
+	async send(payload: SendContactEmailDto) {
 		const html = await ejs.renderFile(
 			path.join(__dirname, this.configService.get<string>('api.contact.emailTemplatePath')),
 			payload,

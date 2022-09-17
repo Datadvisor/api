@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
-export class SendContactRequestDto {
+export class SendContactEmailDto {
 	@ApiProperty()
 	@IsString()
 	lastName: string;
@@ -10,7 +10,7 @@ export class SendContactRequestDto {
 	@IsString()
 	firstName: string;
 
-	@ApiPropertyOptional({})
+	@ApiPropertyOptional()
 	@IsString()
 	@IsOptional()
 	company: string;

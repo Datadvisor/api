@@ -1,1 +1,1 @@
-export * from './send-contact-request.dto';
+export * from './send-contact-email.dto';
