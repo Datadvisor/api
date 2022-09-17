@@ -40,7 +40,7 @@ export class EmailConfirmationController {
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async send(@CurrentUser() user: User): Promise<void> {
 		try {
-			await this.emailConfirmationService.send(user.email);
+			await this.emailConfirmationService.send(user);
 		} catch (err) {
 			if (err instanceof EmailAlreadyConfirmedException) {
 				throw new ConflictException(err.message);
