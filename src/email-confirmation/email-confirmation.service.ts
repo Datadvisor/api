@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import * as ejs from 'ejs';
 import * as path from 'path';
 
@@ -44,18 +45,19 @@ export class EmailConfirmationService {
 	}
 
 	async confirm(token: string): Promise<void> {
-		let payload: EmailConfirmationTokenPayloadType;
-
 		try {
-			payload = await this.jwtService.verifyAsync<EmailConfirmationTokenPayloadType>(token);
-		} catch (err) {
-			throw new InvalidTokenException('Invalid or expired token');
-		}
-		const user = await this.usersService.getByEmail(payload.email);
+			const { email } = await this.jwtService.verifyAsync<EmailConfirmationTokenPayloadType>(token);
+			const user = await this.usersService.getByEmail(email);
 
-		if (user.role !== Role.UNCONFIRMED_USER) {
-			throw new EmailAlreadyConfirmedException('Email already confirmed');
+			if (user.role !== Role.UNCONFIRMED_USER) {
+				throw new EmailAlreadyConfirmedException('Email already confirmed');
+			}
+			await this.usersService.updateRole(user.id, Role.USER);
+		} catch (err) {
+			if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {
+				throw new InvalidTokenException('Invalid or expired token');
+			}
+			throw err;
 		}
-		await this.usersService.updateRole(user.id, Role.USER);
 	}
 }

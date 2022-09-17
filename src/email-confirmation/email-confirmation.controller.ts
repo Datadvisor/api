@@ -24,6 +24,7 @@ import { AuthUser } from '../auth/decorators';
 import { CurrentUser } from '../users/decorators';
 import { User } from '../users/entities';
 import { EmailAlreadyConfirmedException, InvalidTokenException } from './exceptions';
+import { UserNotFoundException } from '../users/exceptions';
 
 @ApiTags('email-confirmation')
 @Controller('email-confirmation')
@@ -62,8 +63,8 @@ export class EmailConfirmationController {
 		} catch (err) {
 			if (err instanceof EmailAlreadyConfirmedException) {
 				throw new GoneException(err.message);
-			} else if (err instanceof InvalidTokenException) {
-				throw new BadRequestException(err.message);
+			} else if (err instanceof InvalidTokenException || err instanceof UserNotFoundException) {
+				throw new BadRequestException('Invalid or expired token');
 			}
 			throw err;
 		}
