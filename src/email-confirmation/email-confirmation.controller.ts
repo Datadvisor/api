@@ -64,7 +64,7 @@ export class EmailConfirmationController {
 			if (err instanceof EmailAlreadyConfirmedException) {
 				throw new GoneException(err.message);
 			} else if (err instanceof InvalidTokenException || err instanceof UserNotFoundException) {
-				throw new BadRequestException(err.message);
+				throw new BadRequestException('Invalid or expired token');
 			}
 			throw err;
 		}
