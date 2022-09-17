@@ -7,7 +7,7 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 
-import { SendContactRequestDto } from './dto';
+import { SendContactEmailDto } from './dto';
 import { ContactService } from './contact.service';
 
 @ApiTags('contact')
@@ -21,7 +21,7 @@ export class ContactController {
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Post()
 	@HttpCode(HttpStatus.NO_CONTENT)
-	async send(@Body() payload: SendContactRequestDto): Promise<void> {
+	async send(@Body() payload: SendContactEmailDto): Promise<void> {
 		await this.contactService.send(payload);
 	}
 }
