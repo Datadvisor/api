@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import * as ejs from 'ejs';
 import * as path from 'path';
 
@@ -46,7 +46,7 @@ export class ResetPasswordService {
 
 	async reset(token: string, payload: ResetPasswordDto): Promise<void> {
 		try {
-			const { email } = this.jwtService.decode(token) as JwtPayload;
+			const { email } = this.jwtService.decode(token) as ResetPasswordTokenPayloadType;
 			const user = await this.usersService.getByEmail(email);
 
 			await this.jwtService.verifyAsync<ResetPasswordTokenPayloadType>(token, {

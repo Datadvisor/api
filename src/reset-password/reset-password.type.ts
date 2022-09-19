@@ -1,3 +1,3 @@
-export class ResetPasswordTokenPayloadType {
+export interface ResetPasswordTokenPayloadType {
 	email: string;
 }
