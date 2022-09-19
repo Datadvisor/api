@@ -10,7 +10,7 @@ import { SendContactEmailDto } from './dto';
 export class ContactService {
 	constructor(private readonly configService: ConfigService, private readonly emailService: EmailService) {}
 
-	async send(payload: SendContactEmailDto) {
+	async send(payload: SendContactEmailDto): Promise<void> {
 		const html = await ejs.renderFile(
 			path.join(__dirname, this.configService.get<string>('api.contact.emailTemplatePath')),
 			payload,
