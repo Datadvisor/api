@@ -1,3 +1,3 @@
-export class EmailConfirmationTokenPayloadType {
+export interface EmailConfirmationTokenPayloadType {
 	email: string;
 }
