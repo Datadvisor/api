@@ -83,6 +83,7 @@ export class AuthController {
 	@Post('/signout')
 	@AuthUser()
 	@HttpCode(HttpStatus.NO_CONTENT)
+	/* istanbul ignore next */
 	async signout(@Session() session: ISession): Promise<void> {
 		await new Promise<void>((resolve, reject) => {
 			session.destroy((err) => {
