@@ -74,13 +74,13 @@ export class UsersService {
 		});
 	}
 
-	async updateRole(id: string, role: Role): Promise<void> {
+	async updateRole(id: string, role: Role): Promise<User | null> {
 		const user = await this.postgresService.user.findUnique({ where: { id } });
 
 		if (!user) {
 			throw new UserNotFoundException('User not found');
 		}
-		await this.postgresService.user.update({
+		return this.postgresService.user.update({
 			data: { role },
 			where: { id },
 		});

@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 import { User, Role } from '../entities';
 
 export class UserRo {
-	constructor(partial: Partial<User> = {}) {
+	constructor(partial: Partial<User>) {
 		Object.assign(this, partial);
 	}
 
