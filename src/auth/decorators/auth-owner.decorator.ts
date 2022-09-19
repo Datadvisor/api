@@ -2,7 +2,7 @@ import { applyDecorators, CustomDecorator, SetMetadata, UseGuards } from '@nestj
 
 import { AuthOwnerGuard, AuthUserGuard } from '../guards';
 
-const SelfLocation = (self = 'id'): CustomDecorator => SetMetadata('self', self);
+const SelfLocation = (self: string): CustomDecorator => SetMetadata('self', self);
 
 export function AuthOwner(self = 'id') {
 	return applyDecorators(UseGuards(AuthUserGuard), SelfLocation(self), UseGuards(AuthOwnerGuard));

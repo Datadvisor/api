@@ -11,7 +11,13 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "collectCoverageFrom": [
-    "**/*.(t|j)s"
+    "src/auth/**/*.(t|j)s",
+    "src/contact/**/*.(t|j)s",
+    "src/email-confirmation/**/*.(t|j)s",
+    "src/reset-password/**/*.(t|j)s",
+    "src/users/**/*.(t|j)s",
+    "!src/**/*.module.(t|j)s",
+    "!src/**/index.(t|j)s"
   ],
   "coverageDirectory": "../coverage"
 }
