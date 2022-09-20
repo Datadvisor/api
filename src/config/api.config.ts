@@ -4,6 +4,7 @@ import * as env from 'env-var';
 export const apiConfig = registerAs('api', () => ({
 	host: env.get('API_HOST').required(true).asString(),
 	port: env.get('API_PORT').required(true).asPortNumber(),
+	env: env.get('NODE_ENV').required(true).asString(),
 	saltRounds: env.get('API_SALT_ROUNDS').default(10).asIntPositive(),
 	cors: {
 		origins: env.get('API_CORS_ORIGINS').default(['*']).asArray(),
