@@ -60,7 +60,6 @@
   "devDependencies": {
     "@faker-js/faker": "^7.5.0",
     "@golevelup/ts-jest": "^0.3.3",
-    "@jest/test-sequencer": "^29.0.3",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
