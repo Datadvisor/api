@@ -1,10 +1,14 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
+import * as cuid from 'cuid';
+import { faker } from '@faker-js/faker/locale/en';
+import { hash } from 'bcrypt';
 import { ConflictException } from '@nestjs/common';
 
 import { UserController } from './user.controller';
 import { UsersService } from './users.service';
-import { User } from './entities';
+import { Role, User } from './entities';
 import { UserRo } from './ro';
 import { UpdateUserDto } from './dto';
 import { UserConflictException } from './exceptions';
@@ -12,17 +16,48 @@ import { UserConflictException } from './exceptions';
 describe('UserController', () => {
 	let userController: UserController;
 	let usersService: UsersService;
+	let configService: ConfigService;
+
+	let user: User;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [UserController],
-			providers: [UsersService],
+			providers: [
+				UsersService,
+				{
+					provide: ConfigService,
+					useValue: {
+						get(key: string) {
+							const env = {
+								'api.saltRounds': 10,
+							};
+
+							return env[key];
+						},
+					},
+				},
+			],
 		})
 			.useMocker(createMock)
 			.compile();
 
 		userController = module.get<UserController>(UserController);
 		usersService = module.get<UsersService>(UsersService);
+		configService = module.get<ConfigService>(ConfigService);
+	});
+
+	beforeEach(async () => {
+		user = {
+			id: cuid(),
+			lastName: faker.name.lastName(),
+			firstName: faker.name.firstName(),
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: await hash(faker.internet.password(8), configService.get<number>('api.saltRounds')),
+			role: Role.USER,
+			createdAt: faker.date.past(),
+			updatedAt: faker.date.past(),
+		};
 	});
 
 	it('should be defined', () => {
@@ -31,65 +66,29 @@ describe('UserController', () => {
 	});
 
 	it('should return the current user', async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-
 		usersService.getById = jest.fn().mockResolvedValue(user);
 		await expect(userController.get(user)).resolves.toMatchObject(new UserRo(user));
 	});
 
 	it('should update the current user', async () => {
 		const payload: UpdateUserDto = {
-			email: 'john.doe@datadvisor.me',
-			password: 'newpassw0rd',
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: faker.internet.password(8),
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-		const updatedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john.doe@datadvisor.me',
-			password: '$2a$10$RnAqBFP2yfe.fUjqtAQnFu6Mh5iw6gtSNjWYVsHDQ8gjf5hnuw.Cq',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			email: payload.email,
+			password: await hash(payload.password, configService.get<number>('api.saltRounds')),
 		};
 
 		usersService.getById = jest.fn().mockResolvedValue(user);
-		usersService.update = jest.fn().mockResolvedValue(updatedUser);
-		await expect(userController.update(user, payload)).resolves.toMatchObject(new UserRo(updatedUser));
+		usersService.update = jest.fn().mockResolvedValue(expectedUser);
+		await expect(userController.update(user, payload)).resolves.toMatchObject(new UserRo(expectedUser));
 	});
 
 	it('should not update the current user with an existing email address', async () => {
 		const payload: UpdateUserDto = {
-			email: 'john@datadvisor.me',
-		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+			email: user.email,
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new UserConflictException());
@@ -98,17 +97,7 @@ describe('UserController', () => {
 
 	it('should not update the current user when an error occurs', async () => {
 		const payload: UpdateUserDto = {
-			email: 'john@datadvisor.me',
-		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+			email: user.email,
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new Error());
@@ -116,17 +105,6 @@ describe('UserController', () => {
 	});
 
 	it('should delete the current user', async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-
 		usersService.getById = jest.fn().mockResolvedValue(user);
 		usersService.delete = jest.fn().mockResolvedValue({});
 		await expect(userController.delete(user)).resolves.toBe(undefined);

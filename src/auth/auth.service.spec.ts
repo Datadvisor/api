@@ -1,27 +1,61 @@
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { createMock } from '@golevelup/ts-jest';
+import { faker } from '@faker-js/faker/locale/en';
+import * as cuid from 'cuid';
 
+import { hash } from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users';
 import { SigninDto, SignupDto } from './dto';
-import { User } from '../users/entities';
+import { Role, User } from '../users/entities';
 import { UnauthorizedAuthException } from './exceptions';
 import { UserConflictException, UserNotFoundException } from '../users/exceptions';
-import { CreateUserDto } from '../users/dto';
 
 describe('AuthService', () => {
 	let authService: AuthService;
+	let configService: ConfigService;
 	let usersService: UsersService;
+
+	let user: User;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			providers: [AuthService],
+			providers: [
+				AuthService,
+				{
+					provide: ConfigService,
+					useValue: {
+						get(key: string) {
+							const env = {
+								'api.saltRounds': 10,
+							};
+
+							return env[key];
+						},
+					},
+				},
+			],
 		})
 			.useMocker(createMock)
 			.compile();
 
 		authService = module.get<AuthService>(AuthService);
+		configService = module.get<ConfigService>(ConfigService);
 		usersService = module.get<UsersService>(UsersService);
+	});
+
+	beforeEach(() => {
+		user = {
+			id: cuid(),
+			lastName: faker.name.lastName(),
+			firstName: faker.name.firstName(),
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: faker.internet.password(8),
+			role: Role.USER,
+			createdAt: faker.date.past(),
+			updatedAt: faker.date.past(),
+		};
 	});
 
 	it('should be defined', () => {
@@ -31,32 +65,26 @@ describe('AuthService', () => {
 
 	it('should signup a user', async () => {
 		const payload: SignupDto = {
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: 'passw0rd',
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		usersService.create = jest.fn().mockResolvedValue(user);
-		await expect(authService.signup(payload)).resolves.toMatchObject(user);
+		usersService.create = jest.fn().mockResolvedValue(expectedUser);
+		await expect(authService.signup(payload)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not signup a user with an existing email address', async () => {
-		const payload: CreateUserDto = {
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: 'passw0rd',
+		const payload: SignupDto = {
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
 		};
 
 		usersService.create = jest.fn().mockRejectedValue(new UserConflictException());
@@ -65,28 +93,22 @@ describe('AuthService', () => {
 
 	it('should sign-in a user', async () => {
 		const payload: SigninDto = {
-			email: 'john@datadvisor.me',
-			password: 'passw0rd',
+			email: user.email,
+			password: user.password,
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		usersService.getByEmail = jest.fn().mockResolvedValue(user);
-		await expect(authService.signin(payload)).resolves.toMatchObject(user);
+		usersService.getByEmail = jest.fn().mockResolvedValue(expectedUser);
+		await expect(authService.signin(payload)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not sign-in an unknown user', async () => {
 		const payload: SigninDto = {
-			email: 'janeth@datadvisor.me',
-			password: 'passw0rd',
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: user.password,
 		};
 
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
@@ -95,21 +117,15 @@ describe('AuthService', () => {
 
 	it('should not sign-in a user with an invalid password', async () => {
 		const payload: SigninDto = {
-			email: 'john@datadvisor.me',
-			password: 'b4dpassw0rd',
+			email: user.email,
+			password: faker.internet.password(8),
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		usersService.getByEmail = jest.fn().mockResolvedValue(user);
+		usersService.getByEmail = jest.fn().mockResolvedValue(expectedUser);
 		await expect(authService.signin(payload)).rejects.toThrowError(UnauthorizedAuthException);
 	});
 });
