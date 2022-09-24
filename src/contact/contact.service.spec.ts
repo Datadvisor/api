@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { createMock } from '@golevelup/ts-jest';
+import { faker } from '@faker-js/faker/locale/en';
 
 import { ContactService } from './contact.service';
 import { EmailService } from '../email';
@@ -45,13 +46,13 @@ describe('ContactService', () => {
 
 	it('should send a contact email', async () => {
 		const payload: SendContactEmailDto = {
-			lastName: 'Doe',
-			firstName: 'John',
-			company: 'Datadvisor',
-			email: 'john@datadvisor.me',
-			phone: '+33612345678',
-			subject: 'Partnership',
-			message: 'Hello, I want to discuss with you about a potential partnership?',
+			lastName: faker.name.lastName(),
+			firstName: faker.name.firstName(),
+			company: faker.company.name(),
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			phone: faker.phone.number(),
+			subject: faker.lorem.text(),
+			message: faker.lorem.sentences(),
 		};
 
 		emailService.send = jest.fn().mockResolvedValue({});

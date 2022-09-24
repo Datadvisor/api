@@ -1,23 +1,29 @@
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { createMock } from '@golevelup/ts-jest';
+import * as cuid from 'cuid';
+import { faker } from '@faker-js/faker/locale/en';
+import { hash } from 'bcrypt';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 import { ResetPasswordService } from './reset-password.service';
 import { EmailService } from '../email';
 import { UsersService } from '../users';
 import { ResetPasswordDto, SendResetPasswordEmailDto } from './dto';
-import { User } from '../users/entities';
+import { Role, User } from '../users/entities';
 import { UserNotFoundException } from '../users/exceptions';
 import { InvalidTokenException } from './exceptions';
 import { ResetPasswordTokenPayloadType } from './reset-password.type';
 
 describe('ResetPasswordService', () => {
 	let resetPasswordService: ResetPasswordService;
+	let configService: ConfigService;
 	let jwtService: JwtService;
 	let emailService: EmailService;
 	let usersService: UsersService;
+
+	let user: User;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -29,6 +35,7 @@ describe('ResetPasswordService', () => {
 						get(key: string) {
 							const env = {
 								'api.frontend.url': 'https://datadvisor.me',
+								'api.saltRounds': 10,
 								'api.reset-password.emailTemplatePath': 'views/reset-password-email.view.ejs',
 								'api.reset-password.jwtSecret': 's3cr3t',
 								'api.email.senderName': 'Datadvisor',
@@ -45,9 +52,23 @@ describe('ResetPasswordService', () => {
 			.compile();
 
 		resetPasswordService = module.get<ResetPasswordService>(ResetPasswordService);
+		configService = module.get<ConfigService>(ConfigService);
 		jwtService = module.get<JwtService>(JwtService);
 		emailService = module.get<EmailService>(EmailService);
 		usersService = module.get<UsersService>(UsersService);
+	});
+
+	beforeEach(async () => {
+		user = {
+			id: cuid(),
+			lastName: faker.name.lastName(),
+			firstName: faker.name.firstName(),
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: await hash(faker.internet.password(8), configService.get<number>('api.saltRounds')),
+			role: Role.USER,
+			createdAt: faker.date.past(),
+			updatedAt: faker.date.past(),
+		};
 	});
 
 	it('should be defined', () => {
@@ -57,29 +78,19 @@ describe('ResetPasswordService', () => {
 
 	it('should send a password reset email to a user', async () => {
 		const payload: SendResetPasswordEmailDto = { email: 'john@datadvisor.me' };
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
+		const token =
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
 
-		jwtService.signAsync = jest
-			.fn()
-			.mockResolvedValue(
-				'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.fyFJ0O5dFEtgOOmkw1Qagmz3yNXn-eIGsEf1uYTQmXk',
-			);
+		jwtService.signAsync = jest.fn().mockResolvedValue(token);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
 		emailService.send = jest.fn().mockResolvedValue({});
 		await expect(resetPasswordService.send(payload)).resolves.toBe(undefined);
 	});
 
 	it('should not send a password reset email to an unknown user', async () => {
-		const payload: SendResetPasswordEmailDto = { email: 'janeth@datadvisor.me' };
+		const payload: SendResetPasswordEmailDto = {
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+		};
 
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
 		await expect(resetPasswordService.send(payload)).rejects.toThrowError(UserNotFoundException);
@@ -87,52 +98,26 @@ describe('ResetPasswordService', () => {
 
 	it("should reset a user's password", async () => {
 		const token =
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.fyFJ0O5dFEtgOOmkw1Qagmz3yNXn-eIGsEf1uYTQmXk';
-		const jwtPayload: ResetPasswordTokenPayloadType = { email: 'john@datadvisor.me' };
-		const payload: ResetPasswordDto = { password: 'newpassw0rd' };
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-		const updatedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
+		const jwtPayload: ResetPasswordTokenPayloadType = { email: user.email };
+		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
+		const expectedUser: User = {
+			...user,
+			password: await hash(payload.password, configService.get<number>('api.saltRounds')),
 		};
 
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(jwtPayload);
-		usersService.update = jest.fn().mockResolvedValue(updatedUser);
+		usersService.update = jest.fn().mockResolvedValue(expectedUser);
 		await expect(resetPasswordService.reset(token, payload)).resolves.toBe(undefined);
 	});
 
 	it('should not reset the password of a user with an invalid token', async () => {
 		const token =
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.fyFJ0O5dFEtgOOmkw1Qagmz3yNXn-eIGsEf1uYTQmXk';
-		const jwtPayload: ResetPasswordTokenPayloadType = { email: 'john@datadvisor.me' };
-		const payload: ResetPasswordDto = { password: 'newpassw0rd' };
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPp';
+		const jwtPayload: ResetPasswordTokenPayloadType = { email: user.email };
+		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
@@ -142,19 +127,9 @@ describe('ResetPasswordService', () => {
 
 	it('should not reset the password of a user with an expired token', async () => {
 		const token =
-			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.fyFJ0O5dFEtgOOmkw1Qagmz3yNXn-eIGsEf1uYTQmXk';
-		const jwtPayload: ResetPasswordTokenPayloadType = { email: 'john@datadvisor.me' };
-		const payload: ResetPasswordDto = { password: 'newpassw0rd' };
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
+			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
+		const jwtPayload: ResetPasswordTokenPayloadType = { email: user.email };
+		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
@@ -165,8 +140,8 @@ describe('ResetPasswordService', () => {
 	it('should not reset the password of an unknown user', async () => {
 		const token =
 			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImphbmV0aEBkYXRhZHZpc29yLm1lIiwiaWF0IjoxNjYzNDQyOTU0LCJleHAiOjE2NjM0NDY1NTR9.Li3K6iMyK2jrNXN99gDPHegIrQrzDwbZhSGewd2hXiQ';
-		const jwtPayload: ResetPasswordTokenPayloadType = { email: 'janeth@datadvisor.me' };
-		const payload: ResetPasswordDto = { password: 'newpassw0rd' };
+		const jwtPayload: ResetPasswordTokenPayloadType = { email: user.email };
+		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
