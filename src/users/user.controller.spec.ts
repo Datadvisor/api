@@ -92,7 +92,7 @@ describe('UserController', () => {
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new UserConflictException());
-		await expect(userController.update(user, payload)).rejects.toThrowError(ConflictException);
+		await expect(userController.update(user, payload)).rejects.toThrow(ConflictException);
 	});
 
 	it('should not update the current user when an error occurs', async () => {
@@ -101,7 +101,7 @@ describe('UserController', () => {
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new Error());
-		await expect(userController.update(user, payload)).rejects.toThrowError(Error);
+		await expect(userController.update(user, payload)).rejects.toThrow(Error);
 	});
 
 	it('should delete the current user', async () => {

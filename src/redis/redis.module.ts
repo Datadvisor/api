@@ -1,6 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { RedisModule as NestRedisModule, RedisModuleOptions, RedisService } from 'nestjs-redis';
+import { RedisModule as NestRedisModule, RedisModuleOptions, RedisService } from '@liaoliaots/nestjs-redis';
 
 @Module({
 	imports: [
@@ -9,14 +9,16 @@ import { RedisModule as NestRedisModule, RedisModuleOptions, RedisService } from
 				const logger = new Logger(RedisService.name);
 
 				return {
-					url: configService.get<string>('redis.url'),
-					onClientReady: (client) => {
-						client.on('error', (err) => {
-							logger.error(err);
-						});
-						client.on('ready', () => {
-							logger.log('Redis successfully connected');
-						});
+					config: {
+						url: configService.get<string>('redis.url'),
+						onClientCreated: (client) => {
+							client.on('error', (err) => {
+								logger.error(err);
+							});
+							client.on('ready', () => {
+								logger.log('Redis successfully connected');
+							});
+						},
 					},
 				};
 			},
