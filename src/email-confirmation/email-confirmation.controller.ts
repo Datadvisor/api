@@ -31,7 +31,7 @@ import { UserNotFoundException } from '../users/exceptions';
 export class EmailConfirmationController {
 	constructor(private readonly emailConfirmationService: EmailConfirmationService) {}
 
-	@ApiOperation({ summary: 'Send an email to confirm user email' })
+	@ApiOperation({ summary: 'Send a confirmation email to a user' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiConflictResponse({ description: 'Conflict' })
@@ -50,7 +50,7 @@ export class EmailConfirmationController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Confirm user email' })
+	@ApiOperation({ summary: 'Confirm a user' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiGoneResponse({ description: 'Gone' })

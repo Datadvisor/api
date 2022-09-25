@@ -36,7 +36,7 @@ import { ISession } from '../session';
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
-	@ApiOperation({ summary: 'Signup user' })
+	@ApiOperation({ summary: 'Signup a user' })
 	@ApiCreatedResponse({ description: 'Success', type: [UserRo] })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiConflictResponse({ description: 'Conflict' })
@@ -54,7 +54,7 @@ export class AuthController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Signin user' })
+	@ApiOperation({ summary: 'Sign-in a user' })
 	@ApiOkResponse({ description: 'Success', type: [UserRo] })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -76,7 +76,7 @@ export class AuthController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Signout user' })
+	@ApiOperation({ summary: 'Sign-out a user' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })

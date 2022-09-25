@@ -35,7 +35,7 @@ import { UserConflictException } from './exceptions';
 export class UserController {
 	constructor(private readonly usersService: UsersService) {}
 
-	@ApiOperation({ summary: 'Get current user' })
+	@ApiOperation({ summary: 'Get the current user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
@@ -46,7 +46,7 @@ export class UserController {
 		return new UserRo(user);
 	}
 
-	@ApiOperation({ summary: 'Update current user' })
+	@ApiOperation({ summary: 'Update the current user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -66,7 +66,7 @@ export class UserController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Delete current user' })
+	@ApiOperation({ summary: 'Delete the current user' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })

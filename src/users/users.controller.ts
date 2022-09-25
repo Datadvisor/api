@@ -38,7 +38,7 @@ import { UpdateUserDto } from './dto';
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
-	@ApiOperation({ summary: 'Get all users' })
+	@ApiOperation({ summary: 'Get a list of users' })
 	@ApiOkResponse({ description: 'Success', type: [UserRo] })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiForbiddenResponse({ description: 'Forbidden' })
@@ -52,7 +52,7 @@ export class UsersController {
 		return users.map((user) => new UserRo(user));
 	}
 
-	@ApiOperation({ summary: 'Get user' })
+	@ApiOperation({ summary: 'Get a user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiForbiddenResponse({ description: 'Forbidden' })
@@ -72,7 +72,7 @@ export class UsersController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Update user' })
+	@ApiOperation({ summary: 'Update a user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -96,7 +96,7 @@ export class UsersController {
 		}
 	}
 
-	@ApiOperation({ summary: 'Delete user' })
+	@ApiOperation({ summary: 'Delete a user' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiForbiddenResponse({ description: 'Forbidden' })
