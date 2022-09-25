@@ -2,7 +2,7 @@ version: '3'
 
 services:
   postgres:
-    image: postgres:14.3-alpine
+    image: postgres:14.5-alpine
     container_name: postgres
     restart: on-failure
     environment:
@@ -15,7 +15,7 @@ services:
       - backend
 
   redis:
-    image: bitnami/redis:7.0
+    image: bitnami/redis:7.0.4
     container_name: redis
     restart: on-failure
     environment:

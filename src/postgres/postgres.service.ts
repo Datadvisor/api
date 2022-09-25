@@ -1,7 +1,8 @@
 import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PrismaClientOptions } from '@prisma/client/runtime';
+import * as url from 'url';
 
 @Injectable()
 export class PostgresService
@@ -46,6 +47,15 @@ export class PostgresService
 		});
 		await this.$connect();
 		this.logger.log('Postgres successfully connected');
+	}
+
+	async reset(): Promise<void> {
+		const tables = Prisma.dmmf.datamodel.models.map((model) => model.name).filter((table) => table);
+		const { schema } = url.parse(this.configService.get<string>('postgres.url'), true, true).query;
+
+		await this.$transaction([
+			...tables.map((table) => this.$executeRawUnsafe(`TRUNCATE TABLE \"${schema}\".\"${table}\" CASCADE;`)),
+		]);
 	}
 
 	async enableShutdownHooks(app: INestApplication): Promise<void> {
