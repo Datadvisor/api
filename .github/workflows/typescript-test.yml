@@ -16,29 +16,27 @@ jobs:
     env:
       API_HOST: localhost
       API_PORT: 8001
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: datadvisor
-      POSTGRES_PASSWORD: passw0rd
-      POSTGRES_DB: datadvisor
-      REDIS_HOST: localhost
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: passw0rd
+
+      POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/datadvisor?schema=api
+
+      REDIS_URL: redis://:${{ secrets.REDIS_PASSWORD }}@localhost:6379/0
+
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
     services:
       postgres:
         image: postgres:14.5-alpine
         env:
-          POSTGRES_USER: datadvisor
-          POSTGRES_PASSWORD: passw0rd
-          POSTGRES_DB: datadvisor
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE }}
         ports:
           - '5432:5432'
 
       redis:
         image: redis:7.0.4-alpine
         env:
-          REDIS_PASSWORD: passw0rd
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
         ports:
           - '6379:6379'
 
@@ -52,7 +50,7 @@ jobs:
           node-version: 17.x
 
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.yarn
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -65,5 +63,5 @@ jobs:
       - name: Run unit tests and coverage
         run: yarn test:cov
 
-      - name: Run e2e tests
-        run: yarn test:e2e
+      - name: Run e2e tests and coverage
+        run: yarn test:e2e:cov

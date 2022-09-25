@@ -26,7 +26,10 @@
     "test:watch": "jest --config ./jest.json --watch --verbose --passWithNoTests",
     "test:cov": "jest --config ./jest.json --coverage --verbose --passWithNoTests",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config ./jest.json --runInBand --verbose --passWithNoTests",
-    "test:e2e": "jest --config ./test/jest-e2e.json --passWithNoTests"
+    "test:e2e": "yarn db:generate && yarn db:migrate && jest --config ./test/jest-e2e.json --runInBand --verbose --passWithNoTests",
+    "test:e2e:watch": "yarn db:generate && yarn db:migrate && jest --config ./test/jest-e2e.json --watch --runInBand --verbose --passWithNoTests",
+    "test:e2e:cov": "yarn db:generate && yarn db:migrate && jest --config ./test/jest-e2e.json --coverage --runInBand --verbose --passWithNoTests",
+    "test:e2e:debug": "yarn db:generate && yarn db:migrate && node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --config ./test/jest-e2e.json --runInBand --verbose --passWithNoTests"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
