@@ -6,11 +6,13 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as morgan from 'morgan';
 
 import { AppModule } from './app.module';
+import { PostgresService } from './postgres';
 import { doc } from './doc';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	const configService = app.get(ConfigService);
+	const postgresService = app.get(PostgresService);
 
 	app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
@@ -22,6 +24,8 @@ async function bootstrap() {
 			},
 		}),
 	);
+
+	await postgresService.enableShutdownHooks(app);
 
 	const corsHeaders = configService.get<string[]>('api.cors.headers');
 	const corsOrigins = configService.get<string[]>('api.cors.origins');
