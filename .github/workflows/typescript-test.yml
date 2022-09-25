@@ -41,7 +41,7 @@ jobs:
           - '5432:5432'
 
       redis:
-        image: redis:7.0.4-alpine
+        image: bitnami/redis:7.0
         env:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
         ports:
@@ -51,10 +51,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js 17.x
+      - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 17.x
+          node-version: 18.x
 
       - name: Cache Node.js modules
         uses: actions/cache@v3
