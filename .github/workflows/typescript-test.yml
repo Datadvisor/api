@@ -16,6 +16,13 @@ jobs:
     env:
       API_HOST: localhost
       API_PORT: 8001
+      API_CONTACT_RECIPIENT_EMAIL: contact@datadvisor.me
+      API_EMAIL_SENDER_NAME: Datadvisor
+      API_EMAIL_SENDER_EMAIL: noreply@datadvisor.me
+      API_EMAIL_CONFIRMATION_JWT_SECRET: ${{ secrets.API_EMAIL_CONFIRMATION_JWT_SECRET }}
+      API_FRONTEND_URL: https://datadvisor.me
+      API_RESET_PASSWORD_JWT_SECRET: ${{ secrets.API_RESET_PASSWORD_JWT_SECRET }}
+      API_SESSION_SECRET: ${{ secrets.API_SESSION_SECRET }}
 
       POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/datadvisor?schema=api
 
