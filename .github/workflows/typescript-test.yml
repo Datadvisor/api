@@ -30,11 +30,15 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ env.POSTGRES_DATABASE }}
+        ports:
+          - '5432:5432'
 
       redis:
         image: redis:7.0.4-alpine
         env:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+        ports:
+          - '6379:6379'
 
     steps:
       - name: Checkout repository
