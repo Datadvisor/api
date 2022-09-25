@@ -17,9 +17,9 @@ jobs:
       API_HOST: localhost
       API_PORT: 8001
 
-      POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@postgres:5432/datadvisor?schema=api
+      POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/datadvisor?schema=api
 
-      REDIS_URL: redis://:${{ secrets.REDIS_PASSWORD }}@redis:6379/0
+      REDIS_URL: redis://:${{ secrets.REDIS_PASSWORD }}@localhost:6379/0
 
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
