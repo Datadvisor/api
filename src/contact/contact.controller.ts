@@ -15,7 +15,7 @@ import { ContactService } from './contact.service';
 export class ContactController {
 	constructor(private readonly contactService: ContactService) {}
 
-	@ApiOperation({ summary: 'Send an email to Datadvisor team' })
+	@ApiOperation({ summary: 'Send a contact email' })
 	@ApiNoContentResponse({ description: 'Success' })
 	@ApiBadRequestResponse({ description: 'Bad request' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
