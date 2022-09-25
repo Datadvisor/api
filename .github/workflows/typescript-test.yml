@@ -16,31 +16,35 @@ jobs:
     env:
       API_HOST: localhost
       API_PORT: 8001
-      POSTGRES_HOST: localhost
+
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-      POSTGRES_USER: datadvisor
-      POSTGRES_PASSWORD: passw0rd
-      POSTGRES_DB: datadvisor
-      REDIS_HOST: localhost
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DATABASE: datadvisor
+      POSTGRES_SCHEMA: api
+      POSTGRES_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}?schema=${POSTGRES_SCHEMA}"
+
+      REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: passw0rd
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      REDIS_DATABASE: 0
+      REDIS_URL: "redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DATABASE}"
+
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
     services:
       postgres:
         image: postgres:14.5-alpine
         env:
-          POSTGRES_USER: datadvisor
-          POSTGRES_PASSWORD: passw0rd
-          POSTGRES_DB: datadvisor
-        ports:
-          - '5432:5432'
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE }}
 
       redis:
         image: redis:7.0.4-alpine
         env:
-          REDIS_PASSWORD: passw0rd
-        ports:
-          - '6379:6379'
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -52,7 +56,7 @@ jobs:
           node-version: 17.x
 
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.yarn
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -65,5 +69,5 @@ jobs:
       - name: Run unit tests and coverage
         run: yarn test:cov
 
-      - name: Run e2e tests
-        run: yarn test:e2e
+      - name: Run e2e tests and coverage
+        run: yarn test:e2e:cov
