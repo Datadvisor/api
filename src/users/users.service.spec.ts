@@ -1,5 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as cuid from 'cuid';
+import { faker } from '@faker-js/faker/locale/en';
 import { createMock } from '@golevelup/ts-jest';
 
 import { UsersService } from './users.service';
@@ -7,10 +9,14 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 import { PostgresService } from '../postgres';
 import { Role, User } from '../users/entities';
 import { UserConflictException, UserNotFoundException } from './exceptions';
+import { hash } from 'bcrypt';
 
 describe('UsersService', () => {
 	let usersService: UsersService;
+	let configService: ConfigService;
 	let postgresService: PostgresService;
+
+	let user: User;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +40,21 @@ describe('UsersService', () => {
 			.compile();
 
 		usersService = module.get<UsersService>(UsersService);
+		configService = module.get<ConfigService>(ConfigService);
 		postgresService = module.get<PostgresService>(PostgresService);
+	});
+
+	beforeEach(() => {
+		user = {
+			id: cuid(),
+			lastName: faker.name.lastName(),
+			firstName: faker.name.firstName(),
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			password: faker.internet.password(8),
+			role: Role.USER,
+			createdAt: faker.date.past(),
+			updatedAt: faker.date.past(),
+		};
 	});
 
 	it('should be defined', () => {
@@ -44,43 +64,27 @@ describe('UsersService', () => {
 
 	it('should create a user', async () => {
 		const payload: CreateUserDto = {
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: 'passw0rd',
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'UNCONFIRMED_USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		postgresService.user.create = jest.fn().mockResolvedValue(user);
-		await expect(usersService.create(payload)).resolves.toMatchObject(user);
+		postgresService.user.create = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.create(payload)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not create a user with an existing email address', async () => {
 		const payload: CreateUserDto = {
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: 'passw0rd',
-		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
@@ -89,26 +93,7 @@ describe('UsersService', () => {
 
 	it('should return a list of users', async () => {
 		const users: User[] = [
-			{
-				id: 'cl86azi1n0004mryy0j7p0mrv',
-				lastName: 'Doe',
-				firstName: 'John',
-				email: 'john@datadvisor.me',
-				password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-				role: 'USER',
-				createdAt: new Date('2022-09-17T19:29:14.267Z'),
-				updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-			},
-			{
-				id: 'cl87f7oam00003b603utiix4b',
-				lastName: 'Doe',
-				firstName: 'Jane',
-				email: 'jane@datadvisor.me',
-				password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-				role: 'USER',
-				createdAt: new Date('2022-09-17T19:29:14.267Z'),
-				updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-			},
+			{ ...user, password: await hash(user.password, configService.get<number>('api.saltRounds')) },
 		];
 
 		postgresService.user.findMany = jest.fn().mockResolvedValue(users);
@@ -116,204 +101,125 @@ describe('UsersService', () => {
 	});
 
 	it('should return a user by id', async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		await expect(usersService.getById('cl86azi1n0004mryy0j7p0mrv')).resolves.toMatchObject(user);
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.getById(user.id)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not return an unknown user by id', async () => {
+		const id = cuid();
+
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.getById('cl86azi1n0004mryy0j7p0mrv')).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.getById(id)).rejects.toThrowError(UserNotFoundException);
 	});
 
 	it('should return a user by email', async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		await expect(usersService.getByEmail('john@datadvisor.me')).resolves.toMatchObject(user);
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.getByEmail(user.email)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not return an unknown user by email', async () => {
+		const email = faker.internet.email(undefined, undefined, 'datadvisor.me');
+
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.getByEmail('janeth@datadvisor.me')).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.getByEmail(email)).rejects.toThrowError(UserNotFoundException);
 	});
 
 	it("should update a user's email", async () => {
 		const payload: UpdateUserDto = {
-			email: 'john.doe@datadvisor.me',
+			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-		const updatedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john.doe@datadvisor.me',
-			password: '$2a$10$RnAqBFP2yfe.fUjqtAQnFu6Mh5iw6gtSNjWYVsHDQ8gjf5hnuw.Cq',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const foundUser = { ...user, password: configService.get<number>('api.saltRounds') };
+		const expectedUser: User = {
+			...user,
+			email: payload.email,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValueOnce(user).mockReturnValueOnce(null);
-		postgresService.user.update = jest.fn().mockResolvedValue(updatedUser);
-		await expect(usersService.update('cl86azi1n0004mryy0j7p0mrv', payload)).resolves.toMatchObject(updatedUser);
+		postgresService.user.findUnique = jest.fn().mockResolvedValueOnce(foundUser).mockReturnValueOnce(null);
+		postgresService.user.update = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.update(user.id, payload)).resolves.toMatchObject(expectedUser);
 	});
 
 	it("should update a user's password", async () => {
 		const payload: UpdateUserDto = {
-			password: 'newpassw0rd',
+			password: faker.internet.password(8),
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-		const updatedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john.doe@datadvisor.me',
-			password: '$2a$10$RnAqBFP2yfe.fUjqtAQnFu6Mh5iw6gtSNjWYVsHDQ8gjf5hnuw.Cq',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const foundUser = { ...user, password: configService.get<number>('api.saltRounds') };
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValueOnce(user).mockReturnValueOnce(null);
-		postgresService.user.update = jest.fn().mockResolvedValue(updatedUser);
-		await expect(usersService.update('cl86azi1n0004mryy0j7p0mrv', payload)).resolves.toMatchObject(updatedUser);
+		postgresService.user.findUnique = jest.fn().mockResolvedValueOnce(foundUser).mockReturnValueOnce(null);
+		postgresService.user.update = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.update(user.id, payload)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not update an unknown user', async () => {
+		const id = cuid();
 		const payload: UpdateUserDto = {
-			password: 'newpassw0rd',
+			password: faker.internet.password(8),
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.update('cl86azi1n0004mryy0j7p0mrv', payload)).rejects.toThrowError(
-			UserNotFoundException,
-		);
+		await expect(usersService.update(id, payload)).rejects.toThrowError(UserNotFoundException);
 	});
 
 	it('should not update a user with an existing email address', async () => {
 		const payload: UpdateUserDto = {
-			email: 'john@datadvisor.me',
+			email: user.email,
 		};
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
+		const foundUser = { ...user, password: configService.get<number>('api.saltRounds') };
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		await expect(usersService.update('cl86azi1n0004mryy0j7p0mrv', payload)).rejects.toThrowError(
-			UserConflictException,
-		);
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(foundUser);
+		await expect(usersService.update(user.id, payload)).rejects.toThrowError(UserConflictException);
 	});
 
 	it("should update a user's role", async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
+			role: Role.USER,
 		};
-		const updatedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
+		const foundUser = { ...user, password: configService.get<number>('api.saltRounds') };
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		postgresService.user.update = jest.fn().mockResolvedValue(updatedUser);
-		await expect(usersService.updateRole('cl86azi1n0004mryy0j7p0mrv', Role.USER)).resolves.toMatchObject(
-			updatedUser,
-		);
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(foundUser);
+		postgresService.user.update = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.updateRole(user.id, Role.USER)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not update the role of an unknown user', async () => {
+		const id = cuid();
+
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.updateRole('cl86azi1n0004mryy0j7p0mrv', Role.USER)).rejects.toThrowError(
-			UserNotFoundException,
-		);
+		await expect(usersService.updateRole(id, Role.USER)).rejects.toThrowError(UserNotFoundException);
 	});
 
 	it('should delete a user', async () => {
-		const user: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
-		};
-		const deletedUser: User = {
-			id: 'cl86azi1n0004mryy0j7p0mrv',
-			lastName: 'Doe',
-			firstName: 'John',
-			email: 'john@datadvisor.me',
-			password: '$2a$10$eQiKBbTlFwuZntlB7ioGUelCLGn.Mn13OJ4HXVWiGR8YuIyLBpNnK',
-			role: 'USER',
-			createdAt: new Date('2022-09-17T19:29:14.267Z'),
-			updatedAt: new Date('2022-09-17T19:29:14.268Z'),
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
 
-		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		postgresService.user.delete = jest.fn().mockResolvedValue(deletedUser);
-		await expect(usersService.delete('cl86azi1n0004mryy0j7p0mrv')).resolves.toMatchObject(deletedUser);
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(expectedUser);
+		postgresService.user.delete = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.delete(user.id)).resolves.toMatchObject(expectedUser);
 	});
 
 	it('should not delete an unknown user', async () => {
+		const id = cuid();
+
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.delete('cl86azi1n0004mryy0j7p0mrv')).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.delete(id)).rejects.toThrowError(UserNotFoundException);
 	});
 });
