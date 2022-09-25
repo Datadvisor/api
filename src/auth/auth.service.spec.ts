@@ -88,7 +88,7 @@ describe('AuthService', () => {
 		};
 
 		usersService.create = jest.fn().mockRejectedValue(new UserConflictException());
-		await expect(authService.signup(payload)).rejects.toThrowError(UserConflictException);
+		await expect(authService.signup(payload)).rejects.toThrow(UserConflictException);
 	});
 
 	it('should sign-in a user', async () => {
@@ -112,7 +112,7 @@ describe('AuthService', () => {
 		};
 
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(authService.signin(payload)).rejects.toThrowError(UserNotFoundException);
+		await expect(authService.signin(payload)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it('should not sign-in a user with an invalid password', async () => {
@@ -126,6 +126,6 @@ describe('AuthService', () => {
 		};
 
 		usersService.getByEmail = jest.fn().mockResolvedValue(expectedUser);
-		await expect(authService.signin(payload)).rejects.toThrowError(UnauthorizedAuthException);
+		await expect(authService.signin(payload)).rejects.toThrow(UnauthorizedAuthException);
 	});
 });

@@ -86,7 +86,7 @@ describe('EmailConfirmationService', () => {
 	it('should not send a confirmation email to an already confirmed user', async () => {
 		const expectedUser: User = { ...user, role: Role.USER };
 
-		await expect(emailConfirmationService.send(expectedUser)).rejects.toThrowError(EmailAlreadyConfirmedException);
+		await expect(emailConfirmationService.send(expectedUser)).rejects.toThrow(EmailAlreadyConfirmedException);
 	});
 
 	it('should confirm a user', async () => {
@@ -109,7 +109,7 @@ describe('EmailConfirmationService', () => {
 
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(expectedUser);
-		await expect(emailConfirmationService.confirm(token)).rejects.toThrowError(EmailAlreadyConfirmedException);
+		await expect(emailConfirmationService.confirm(token)).rejects.toThrow(EmailAlreadyConfirmedException);
 	});
 
 	it('should not confirm a user with an invalid token', async () => {
@@ -117,7 +117,7 @@ describe('EmailConfirmationService', () => {
 			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPp';
 
 		jwtService.verifyAsync = jest.fn().mockRejectedValue(new JsonWebTokenError(''));
-		await expect(emailConfirmationService.confirm(token)).rejects.toThrowError(InvalidTokenException);
+		await expect(emailConfirmationService.confirm(token)).rejects.toThrow(InvalidTokenException);
 	});
 
 	it('should not confirm a user with an expired token', async () => {
@@ -125,7 +125,7 @@ describe('EmailConfirmationService', () => {
 			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
 
 		jwtService.verifyAsync = jest.fn().mockRejectedValue(new TokenExpiredError('', faker.date.past()));
-		await expect(emailConfirmationService.confirm(token)).rejects.toThrowError(InvalidTokenException);
+		await expect(emailConfirmationService.confirm(token)).rejects.toThrow(InvalidTokenException);
 	});
 
 	it('should not confirm an unknown user', async () => {
@@ -137,6 +137,6 @@ describe('EmailConfirmationService', () => {
 
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(emailConfirmationService.confirm(token)).rejects.toThrowError(UserNotFoundException);
+		await expect(emailConfirmationService.confirm(token)).rejects.toThrow(UserNotFoundException);
 	});
 });

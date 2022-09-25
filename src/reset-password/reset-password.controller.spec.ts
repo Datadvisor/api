@@ -85,7 +85,7 @@ describe('ResetPasswordController', () => {
 		const payload: SendResetPasswordEmailDto = { email: user.email };
 
 		resetPasswordService.send = jest.fn().mockRejectedValue(new Error());
-		await expect(resetPasswordController.send(payload)).rejects.toThrowError(Error);
+		await expect(resetPasswordController.send(payload)).rejects.toThrow(Error);
 	});
 
 	it("should reset a user's password", async () => {
@@ -103,7 +103,7 @@ describe('ResetPasswordController', () => {
 		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		resetPasswordService.reset = jest.fn().mockRejectedValue(new InvalidTokenException());
-		await expect(resetPasswordController.reset(token, payload)).rejects.toThrowError(BadRequestException);
+		await expect(resetPasswordController.reset(token, payload)).rejects.toThrow(BadRequestException);
 	});
 
 	it('should not reset the password of a user with an expired token', async () => {
@@ -112,7 +112,7 @@ describe('ResetPasswordController', () => {
 		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		resetPasswordService.reset = jest.fn().mockRejectedValue(new InvalidTokenException());
-		await expect(resetPasswordController.reset(token, payload)).rejects.toThrowError(BadRequestException);
+		await expect(resetPasswordController.reset(token, payload)).rejects.toThrow(BadRequestException);
 	});
 
 	it('should not reset the password of an unknown user', async () => {
@@ -121,7 +121,7 @@ describe('ResetPasswordController', () => {
 		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		resetPasswordService.reset = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(resetPasswordController.reset(token, payload)).rejects.toThrowError(BadRequestException);
+		await expect(resetPasswordController.reset(token, payload)).rejects.toThrow(BadRequestException);
 	});
 
 	it("should not reset a user's password when an error occurs", async () => {
@@ -130,6 +130,6 @@ describe('ResetPasswordController', () => {
 		const payload: ResetPasswordDto = { password: faker.internet.password(8) };
 
 		resetPasswordService.reset = jest.fn().mockRejectedValue(new Error());
-		await expect(resetPasswordController.reset(token, payload)).rejects.toThrowError(Error);
+		await expect(resetPasswordController.reset(token, payload)).rejects.toThrow(Error);
 	});
 });

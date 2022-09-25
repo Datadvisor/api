@@ -92,7 +92,7 @@ describe('AuthController', () => {
 		};
 
 		authService.signup = jest.fn().mockRejectedValue(new UserConflictException());
-		await expect(authController.signup(payload)).rejects.toThrowError(ConflictException);
+		await expect(authController.signup(payload)).rejects.toThrow(ConflictException);
 	});
 
 	it('should not signup a user when an error occurs', async () => {
@@ -104,7 +104,7 @@ describe('AuthController', () => {
 		};
 
 		authService.signup = jest.fn().mockRejectedValue(new Error());
-		await expect(authController.signup(payload)).rejects.toThrowError(Error);
+		await expect(authController.signup(payload)).rejects.toThrow(Error);
 	});
 
 	it('should sign-in a user', async () => {
@@ -136,7 +136,7 @@ describe('AuthController', () => {
 		} as unknown as ISession;
 
 		authService.signin = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(authController.signin(payload, session)).rejects.toThrowError(UnauthorizedException);
+		await expect(authController.signin(payload, session)).rejects.toThrow(UnauthorizedException);
 	});
 
 	it('should not sign-in a user with an invalid password', async () => {
@@ -150,7 +150,7 @@ describe('AuthController', () => {
 		} as unknown as ISession;
 
 		authService.signin = jest.fn().mockRejectedValue(new UnauthorizedAuthException());
-		await expect(authController.signin(payload, session)).rejects.toThrowError(UnauthorizedException);
+		await expect(authController.signin(payload, session)).rejects.toThrow(UnauthorizedException);
 	});
 
 	it('should not sign-in when an error occurs', async () => {
@@ -164,6 +164,6 @@ describe('AuthController', () => {
 		} as unknown as ISession;
 
 		authService.signin = jest.fn().mockRejectedValue(new Error());
-		await expect(authController.signin(payload, session)).rejects.toThrowError(Error);
+		await expect(authController.signin(payload, session)).rejects.toThrow(Error);
 	});
 });

@@ -88,7 +88,7 @@ describe('UsersService', () => {
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
-		await expect(usersService.create(payload)).rejects.toThrowError(UserConflictException);
+		await expect(usersService.create(payload)).rejects.toThrow(UserConflictException);
 	});
 
 	it('should return a list of users', async () => {
@@ -114,7 +114,7 @@ describe('UsersService', () => {
 		const id = cuid();
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.getById(id)).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.getById(id)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it('should return a user by email', async () => {
@@ -131,7 +131,7 @@ describe('UsersService', () => {
 		const email = faker.internet.email(undefined, undefined, 'datadvisor.me');
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.getByEmail(email)).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.getByEmail(email)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it("should update a user's email", async () => {
@@ -172,7 +172,7 @@ describe('UsersService', () => {
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.update(id, payload)).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.update(id, payload)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it('should not update a user with an existing email address', async () => {
@@ -182,7 +182,7 @@ describe('UsersService', () => {
 		const foundUser = { ...user, password: configService.get<number>('api.saltRounds') };
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(foundUser);
-		await expect(usersService.update(user.id, payload)).rejects.toThrowError(UserConflictException);
+		await expect(usersService.update(user.id, payload)).rejects.toThrow(UserConflictException);
 	});
 
 	it("should update a user's role", async () => {
@@ -202,7 +202,7 @@ describe('UsersService', () => {
 		const id = cuid();
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.updateRole(id, Role.USER)).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.updateRole(id, Role.USER)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it('should delete a user', async () => {
@@ -220,6 +220,6 @@ describe('UsersService', () => {
 		const id = cuid();
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
-		await expect(usersService.delete(id)).rejects.toThrowError(UserNotFoundException);
+		await expect(usersService.delete(id)).rejects.toThrow(UserNotFoundException);
 	});
 });

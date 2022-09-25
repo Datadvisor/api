@@ -81,12 +81,12 @@ describe('UsersController', () => {
 		const id = cuid();
 
 		usersService.getById = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(usersController.getById(id)).rejects.toThrowError(NotFoundException);
+		await expect(usersController.getById(id)).rejects.toThrow(NotFoundException);
 	});
 
 	it('should not return a user when an error occurs', async () => {
 		usersService.getById = jest.fn().mockRejectedValue(new Error());
-		await expect(usersController.getById(user.id)).rejects.toThrowError(Error);
+		await expect(usersController.getById(user.id)).rejects.toThrow(Error);
 	});
 
 	it('should update a user', async () => {
@@ -112,7 +112,7 @@ describe('UsersController', () => {
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(usersController.update(id, payload)).rejects.toThrowError(NotFoundException);
+		await expect(usersController.update(id, payload)).rejects.toThrow(NotFoundException);
 	});
 
 	it('should not update a user with an existing email address', async () => {
@@ -121,7 +121,7 @@ describe('UsersController', () => {
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new UserConflictException());
-		await expect(usersController.update(user.id, payload)).rejects.toThrowError(ConflictException);
+		await expect(usersController.update(user.id, payload)).rejects.toThrow(ConflictException);
 	});
 
 	it('should not update a user when an error occurs', async () => {
@@ -130,7 +130,7 @@ describe('UsersController', () => {
 		};
 
 		usersService.update = jest.fn().mockRejectedValue(new Error());
-		await expect(usersController.update(user.id, payload)).rejects.toThrowError(Error);
+		await expect(usersController.update(user.id, payload)).rejects.toThrow(Error);
 	});
 
 	it('should delete a user', async () => {
@@ -143,13 +143,13 @@ describe('UsersController', () => {
 		const id = cuid();
 
 		usersService.delete = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(usersController.delete(id)).rejects.toThrowError(NotFoundException);
+		await expect(usersController.delete(id)).rejects.toThrow(NotFoundException);
 	});
 
 	it('should not delete a user when an error occurs', async () => {
 		const id = cuid();
 
 		usersService.delete = jest.fn().mockRejectedValue(new Error());
-		await expect(usersController.delete(id)).rejects.toThrowError(Error);
+		await expect(usersController.delete(id)).rejects.toThrow(Error);
 	});
 });

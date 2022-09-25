@@ -93,7 +93,7 @@ describe('ResetPasswordService', () => {
 		};
 
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(resetPasswordService.send(payload)).rejects.toThrowError(UserNotFoundException);
+		await expect(resetPasswordService.send(payload)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it("should reset a user's password", async () => {
@@ -122,7 +122,7 @@ describe('ResetPasswordService', () => {
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
 		jwtService.verifyAsync = jest.fn().mockRejectedValue(new JsonWebTokenError(''));
-		await expect(resetPasswordService.reset(token, payload)).rejects.toThrowError(InvalidTokenException);
+		await expect(resetPasswordService.reset(token, payload)).rejects.toThrow(InvalidTokenException);
 	});
 
 	it('should not reset the password of a user with an expired token', async () => {
@@ -134,7 +134,7 @@ describe('ResetPasswordService', () => {
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
 		jwtService.verifyAsync = jest.fn().mockRejectedValue(new TokenExpiredError('', new Date()));
-		await expect(resetPasswordService.reset(token, payload)).rejects.toThrowError(InvalidTokenException);
+		await expect(resetPasswordService.reset(token, payload)).rejects.toThrow(InvalidTokenException);
 	});
 
 	it('should not reset the password of an unknown user', async () => {
@@ -145,6 +145,6 @@ describe('ResetPasswordService', () => {
 
 		jwtService.decode = jest.fn().mockResolvedValue(jwtPayload);
 		usersService.getByEmail = jest.fn().mockRejectedValue(new UserNotFoundException());
-		await expect(resetPasswordService.reset(token, payload)).rejects.toThrowError(UserNotFoundException);
+		await expect(resetPasswordService.reset(token, payload)).rejects.toThrow(UserNotFoundException);
 	});
 });
