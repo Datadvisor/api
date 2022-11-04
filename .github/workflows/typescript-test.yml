@@ -1,0 +1,74 @@
+name: Typescript Test
+
+on:
+  push:
+    branches:
+      - '**'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  typescript-test:
+    runs-on: ubuntu-latest
+
+    env:
+      API_HOST: localhost
+      API_PORT: 8001
+      API_CONTACT_RECIPIENT_EMAIL: contact@datadvisor.me
+      API_EMAIL_SENDER_NAME: Datadvisor
+      API_EMAIL_SENDER_EMAIL: noreply@datadvisor.me
+      API_EMAIL_CONFIRMATION_JWT_SECRET: ${{ secrets.API_EMAIL_CONFIRMATION_JWT_SECRET }}
+      API_FRONTEND_URL: https://datadvisor.me
+      API_RESET_PASSWORD_JWT_SECRET: ${{ secrets.API_RESET_PASSWORD_JWT_SECRET }}
+      API_SESSION_SECRET: ${{ secrets.API_SESSION_SECRET }}
+
+      POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/datadvisor?schema=api
+
+      REDIS_URL: redis://:${{ secrets.REDIS_PASSWORD }}@localhost:6379/0
+
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+
+    services:
+      postgres:
+        image: postgres:14.5-alpine
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE }}
+        ports:
+          - '5432:5432'
+
+      redis:
+        image: bitnami/redis:7.0
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+        ports:
+          - '6379:6379'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run unit tests and coverage
+        run: yarn test:cov
+
+      - name: Run e2e tests and coverage
+        run: yarn test:e2e:cov

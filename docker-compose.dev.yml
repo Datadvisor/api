@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:14.5-alpine
+    container_name: postgres
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - backend
+
+  redis:
+    image: bitnami/redis:7.0
+    container_name: redis
+    restart: on-failure
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - '${REDIS_PORT}:6379'
+    networks:
+      - backend
+
+networks:
+  backend:
