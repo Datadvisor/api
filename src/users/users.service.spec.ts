@@ -5,11 +5,12 @@ import { faker } from '@faker-js/faker/locale/en';
 import { createMock } from '@golevelup/ts-jest';
 
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, UpdateUserPreferencesDto } from './dto';
 import { PostgresService } from '../postgres';
 import { Role, User } from '../users/entities';
 import { UserConflictException, UserNotFoundException } from './exceptions';
 import { hash } from 'bcrypt';
+import { Preferences } from '@prisma/client';
 
 describe('UsersService', () => {
 	let usersService: UsersService;
@@ -62,12 +63,31 @@ describe('UsersService', () => {
 		expect(usersService).toBeDefined();
 	});
 
-	it('should create a user', async () => {
+	it('should create a user without subscribe to the newsletter', async () => {
 		const payload: CreateUserDto = {
 			lastName: user.lastName,
 			firstName: user.firstName,
 			email: user.email,
 			password: user.password,
+			newsletter: false,
+		};
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
+		};
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
+		postgresService.user.create = jest.fn().mockResolvedValue(expectedUser);
+		await expect(usersService.create(payload)).resolves.toMatchObject(expectedUser);
+	});
+
+	it('should create a user and subscribe to the newsletter', async () => {
+		const payload: CreateUserDto = {
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
+			newsletter: true,
 		};
 		const expectedUser: User = {
 			...user,
@@ -85,6 +105,7 @@ describe('UsersService', () => {
 			firstName: user.firstName,
 			email: user.email,
 			password: user.password,
+			newsletter: false,
 		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
@@ -132,6 +153,25 @@ describe('UsersService', () => {
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
 		await expect(usersService.getByEmail(email)).rejects.toThrow(UserNotFoundException);
+	});
+
+	it("should return the user's preferences by user id", async () => {
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: false,
+			userId: user.id,
+		};
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
+		postgresService.preferences.findUnique = jest.fn().mockResolvedValue(expectedPreferences);
+		await expect(usersService.getPreferences(user.id)).resolves.toMatchObject(expectedPreferences);
+	});
+
+	it("should not return the user's preferences for an unknown user", async () => {
+		const id = cuid();
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
+		await expect(usersService.getPreferences(id)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it("should update a user's email", async () => {
@@ -203,6 +243,45 @@ describe('UsersService', () => {
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
 		await expect(usersService.updateRole(id, Role.USER)).rejects.toThrow(UserNotFoundException);
+	});
+
+	it("should update a user's newsletter preference when the user subscribe to the newsletter", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: true,
+			userId: user.id,
+		};
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
+		postgresService.preferences.update = jest.fn().mockResolvedValue(expectedPreferences);
+		await expect(usersService.updatePreferences(user.id, payload)).resolves.toMatchObject(expectedPreferences);
+	});
+
+	it("should update a user's newsletter preference when the user unsubscribe from the newsletter", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: false,
+		};
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: false,
+			userId: user.id,
+		};
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(user);
+		postgresService.preferences.update = jest.fn().mockResolvedValue(expectedPreferences);
+		await expect(usersService.updatePreferences(user.id, payload)).resolves.toMatchObject(expectedPreferences);
+	});
+
+	it("should not update a user's newsletter preference for an unknown user", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+
+		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
+		await expect(usersService.updatePreferences(user.id, payload)).rejects.toThrow(UserNotFoundException);
 	});
 
 	it('should delete a user', async () => {

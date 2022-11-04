@@ -11,6 +11,7 @@ import { RedisModule } from './redis';
 import { ResetPasswordModule } from './reset-password';
 import { SessionModule } from './session';
 import { UsersModule } from './users';
+import { NewsletterModule } from './newsletter';
 
 @Module({
 	imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from './users';
 		EmailModule,
 		EmailConfirmationModule,
 		LoggerModule,
+		NewsletterModule,
 		PostgresModule,
 		RedisModule,
 		ResetPasswordModule,

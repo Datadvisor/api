@@ -11,5 +11,13 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
-  "coverageDirectory": "../coverage-e2e"
+  "collectCoverageFrom": [
+    "src/auth/**/*.(t|j)s",
+    "src/contact/**/*.(t|j)s",
+    "src/email-confirmation/**/*.(t|j)s",
+    "src/reset-password/**/*.(t|j)s",
+    "src/users/**/*.(t|j)s",
+    "!src/**/*.spec.(t|j)s"
+  ],
+  "coverageDirectory": "./coverage-e2e"
 }

@@ -32,10 +32,32 @@ export class SeederService {
 				create: {
 					...user,
 					password: await hash(user.password, this.configService.get<number>('api.saltRounds')),
+					preferences: {
+						create: {
+							newsletter: false,
+						},
+					},
 				},
 			});
 			users.push(user);
 		}
 		return users;
+	}
+
+	async createUser(user: User): Promise<User> {
+		await this.postgresService.user.upsert({
+			where: { email: user.email },
+			update: {},
+			create: {
+				...user,
+				password: await hash(user.password, this.configService.get<number>('api.saltRounds')),
+				preferences: {
+					create: {
+						newsletter: false,
+					},
+				},
+			},
+		});
+		return user;
 	}
 }

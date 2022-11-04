@@ -53,12 +53,13 @@ describe('Auth', () => {
 		await app.close();
 	});
 
-	it('should signup a user', async () => {
+	it('should signup a user without subscribe to the newsletter', async () => {
 		const payload: SignupDto = {
 			lastName: users.at(0).lastName,
 			firstName: users.at(0).firstName,
 			email: users.at(0).email,
 			password: users.at(0).password,
+			newsletter: false,
 		};
 		const response = await request(app.getHttpServer()).post('/auth/signup').send(payload);
 
@@ -71,6 +72,7 @@ describe('Auth', () => {
 			firstName: users.at(0).firstName,
 			email: users.at(0).email,
 			password: users.at(0).password,
+			newsletter: false,
 		};
 		const response = await request(app.getHttpServer()).post('/auth/signup').send(payload);
 

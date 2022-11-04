@@ -63,12 +63,30 @@ describe('AuthService', () => {
 		expect(authService).toBeDefined();
 	});
 
-	it('should signup a user', async () => {
+	it('should signup a user without subscribe to the newsletter', async () => {
 		const payload: SignupDto = {
 			lastName: user.lastName,
 			firstName: user.firstName,
 			email: user.email,
 			password: user.password,
+			newsletter: false,
+		};
+		const expectedUser: User = {
+			...user,
+			password: await hash(user.password, configService.get<number>('api.saltRounds')),
+		};
+
+		usersService.create = jest.fn().mockResolvedValue(expectedUser);
+		await expect(authService.signup(payload)).resolves.toMatchObject(expectedUser);
+	});
+
+	it('should signup a user and subscribe to the newsletter', async () => {
+		const payload: SignupDto = {
+			lastName: user.lastName,
+			firstName: user.firstName,
+			email: user.email,
+			password: user.password,
+			newsletter: true,
 		};
 		const expectedUser: User = {
 			...user,
@@ -85,6 +103,7 @@ describe('AuthService', () => {
 			firstName: user.firstName,
 			email: user.email,
 			password: user.password,
+			newsletter: false,
 		};
 
 		usersService.create = jest.fn().mockRejectedValue(new UserConflictException());

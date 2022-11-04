@@ -12,7 +12,7 @@ import { ConfigModule } from '../../src/config';
 import { SessionModule } from '../../src/session';
 import { UsersModule } from '../../src/users';
 import { SigninDto } from '../../src/auth/dto';
-import { UpdateUserDto } from '../../src/users/dto';
+import { UpdateUserDto, UpdateUserPreferencesDto } from '../../src/users/dto';
 import { Role, User } from '../../src/users/entities';
 
 describe('User', () => {
@@ -70,6 +70,19 @@ describe('User', () => {
 		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 	});
 
+	it("should return the current user's preferences", async () => {
+		const authCookie = `${userAuthCookies.at(0).API_SID.name}=${userAuthCookies.at(0).API_SID.value}`;
+		const response = await request(app.getHttpServer()).get('/user/preferences').set('Cookie', authCookie);
+
+		expect(response.status).toEqual(HttpStatus.OK);
+	});
+
+	it("should not return the current user's preferences when the user is not signed-in", async () => {
+		const response = await request(app.getHttpServer()).get(`/users/${users.at(0).id}/preferences`);
+
+		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
+	});
+
 	it('should update the current user', async () => {
 		const payload: UpdateUserDto = {
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
@@ -98,6 +111,17 @@ describe('User', () => {
 			password: faker.internet.password(8),
 		};
 		const response = await request(app.getHttpServer()).patch('/user').send(payload);
+
+		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
+	});
+
+	it("should not update the current user's newsletter preference by id when the user is not signed-in", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+		const response = await request(app.getHttpServer())
+			.patch(`/users/${users.at(0).id}/preferences`)
+			.send(payload);
 
 		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
 	});

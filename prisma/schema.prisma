@@ -16,13 +16,21 @@ enum Role {
   ADMIN
 }
 
+model Preferences {
+  id                String          @id @default(cuid())
+  newsletter        Boolean
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String          @unique
+}
+
 model User {
-  id                String    @id @default(cuid())
+  id                String          @id @default(cuid())
   lastName          String
   firstName         String
-  email             String    @unique
+  email             String          @unique
   password          String?
-  role              Role      @default(UNCONFIRMED_USER)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  role              Role            @default(UNCONFIRMED_USER)
+  preferences       Preferences?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
