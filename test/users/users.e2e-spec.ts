@@ -14,7 +14,7 @@ import { ConfigModule } from '../../src/config';
 import { SessionModule } from '../../src/session';
 import { UsersModule } from '../../src/users';
 import { SigninDto } from '../../src/auth/dto';
-import { UpdateUserDto } from '../../src/users/dto';
+import { UpdateUserDto, UpdateUserPreferencesDto } from '../../src/users/dto';
 
 describe('Users', () => {
 	let app: INestApplication;
@@ -132,6 +132,47 @@ describe('Users', () => {
 		expect(response.status).toEqual(HttpStatus.FORBIDDEN);
 	});
 
+	it("should return the current user's preferences by id", async () => {
+		const authCookie = `${userAuthCookies.at(0).API_SID.name}=${userAuthCookies.at(0).API_SID.value}`;
+		const response = await request(app.getHttpServer())
+			.get(`/users/${users.at(0).id}/preferences`)
+			.set('Cookie', authCookie);
+
+		expect(response.status).toEqual(HttpStatus.OK);
+	});
+
+	it("should return the user's preferences by id", async () => {
+		const authCookie = `${adminAuthCookies.at(0).API_SID.name}=${adminAuthCookies.at(0).API_SID.value}`;
+		const response = await request(app.getHttpServer())
+			.get(`/users/${users.at(0).id}/preferences`)
+			.set('Cookie', authCookie);
+
+		expect(response.status).toEqual(HttpStatus.OK);
+	});
+
+	it("should not return the user's preferences by id for an unknown user", async () => {
+		const id = cuid();
+		const authCookie = `${adminAuthCookies.at(0).API_SID.name}=${adminAuthCookies.at(0).API_SID.value}`;
+		const response = await request(app.getHttpServer()).get(`/users/${id}/preferences`).set('Cookie', authCookie);
+
+		expect(response.status).toEqual(HttpStatus.NOT_FOUND);
+	});
+
+	it("should not return the user's preferences when the user is not signed-in", async () => {
+		const response = await request(app.getHttpServer()).get(`/users/${users.at(0).id}/preferences`);
+
+		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
+	});
+
+	it("should not return the user's preferences by id when the user does not have the necessary role", async () => {
+		const authCookie = `${userAuthCookies.at(0).API_SID.name}=${userAuthCookies.at(0).API_SID.value}`;
+		const response = await request(app.getHttpServer())
+			.get(`/users/${adminUsers.at(0).id}/preferences`)
+			.set('Cookie', authCookie);
+
+		expect(response.status).toEqual(HttpStatus.FORBIDDEN);
+	});
+
 	it('should update the current user by id', async () => {
 		const payload: UpdateUserDto = {
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
@@ -177,7 +218,7 @@ describe('Users', () => {
 		expect(response.status).toEqual(HttpStatus.NOT_FOUND);
 	});
 
-	it('should not update a user with an existing email address', async () => {
+	it('should not update a user by id with an existing email address', async () => {
 		const payload: UpdateUserDto = {
 			email: users.at(0).email,
 		};
@@ -210,6 +251,31 @@ describe('Users', () => {
 		const authCookie = `${userAuthCookies.at(0).API_SID.name}=${userAuthCookies.at(0).API_SID.value}`;
 		const response = await request(app.getHttpServer())
 			.patch(`/users/${adminUsers.at(0).id}`)
+			.set('Cookie', authCookie)
+			.send(payload);
+
+		expect(response.status).toEqual(HttpStatus.FORBIDDEN);
+	});
+
+	it("should not update a user's newsletter preference by id when the user is not signed-in", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+		const response = await request(app.getHttpServer())
+			.patch(`/users/${users.at(0).id}/preferences`)
+			.send(payload);
+
+		expect(response.status).toEqual(HttpStatus.UNAUTHORIZED);
+	});
+
+	it("should not update a user's newsletter preference by id when the user does not have the necessary role", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+		const authCookie = `${userAuthCookies.at(0).API_SID.name}=${userAuthCookies.at(0).API_SID.value}`;
+		console.log(authCookie);
+		const response = await request(app.getHttpServer())
+			.patch(`/users/${adminUsers.at(0).id}/preferences`)
 			.set('Cookie', authCookie)
 			.send(payload);
 

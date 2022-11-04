@@ -9,7 +9,7 @@ import { AppModule } from './app.module';
 import { PostgresService } from './postgres';
 import { doc } from './doc';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule);
 	const configService = app.get(ConfigService);
 	const postgresService = app.get(PostgresService);

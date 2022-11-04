@@ -36,6 +36,9 @@ export const apiConfig = registerAs('api', () => ({
 		combinedPath: env.get('API_LOGS_COMBINED_PATH').default('logs/combined.log').asString(),
 		errorPath: env.get('API_LOGS_ERROR_PATH').default('logs/error.log').asString(),
 	},
+	newsletter: {
+		listId: env.get('API_NEWSLETTER_LIST_ID').required(true).asString(),
+	},
 	'reset-password': {
 		emailTemplatePath: env
 			.get('API_RESET_PASSWORD_EMAIL_TEMPLATE_PATH')
