@@ -54,7 +54,7 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: "Get the current user's preferences" })
-	@ApiOkResponse({ description: 'Success' })
+	@ApiOkResponse({ description: 'Success', type: UserPreferencesRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
@@ -86,7 +86,7 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: "Update the current user's preferences" })
-	@ApiOkResponse({ description: 'Success' })
+	@ApiOkResponse({ description: 'Success', type: UserPreferencesRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiNotFoundResponse({ description: 'Not found' })
 	@ApiConflictResponse({ description: 'Conflict' })

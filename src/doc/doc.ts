@@ -7,7 +7,6 @@ export const doc = new DocumentBuilder()
 	.addTag('auth', 'Auth module')
 	.addTag('contact', 'Contact module')
 	.addTag('email-confirmation', 'Email confirmation module')
-	.addTag('newsletter', 'Newsletter module')
 	.addTag('reset-password', 'Reset password module')
 	.addTag('users', 'Users module')
 	.build();
