@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
 	@ApiProperty()
@@ -19,4 +19,8 @@ export class CreateUserDto {
 	@MinLength(8)
 	@MaxLength(64)
 	password: string;
+
+	@ApiProperty()
+	@IsBoolean()
+	newsletter: boolean;
 }

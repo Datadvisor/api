@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { PostgresModule } from '../postgres';
+import { PostgresModule } from '../postgres/postgres.module';
 import { SeederService } from './seeder.service';
 
 @Module({

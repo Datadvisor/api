@@ -1,17 +1,21 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
-import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
 import { hash } from 'bcrypt';
-import { ConflictException } from '@nestjs/common';
+import * as cuid from 'cuid';
 
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Preferences, Role, User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserRo } from './ro/user.ro';
+import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UserController } from './user.controller';
 import { UsersService } from './users.service';
-import { Role, User } from './entities';
-import { UserRo } from './ro';
-import { UpdateUserDto } from './dto';
-import { UserConflictException } from './exceptions';
 
 describe('UserController', () => {
 	let userController: UserController;
@@ -70,6 +74,17 @@ describe('UserController', () => {
 		await expect(userController.get(user)).resolves.toMatchObject(new UserRo(user));
 	});
 
+	it("should return the current user's preferences", async () => {
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: false,
+			userId: user.id,
+		};
+
+		usersService.getPreferences = jest.fn().mockResolvedValue(expectedPreferences);
+		await expect(userController.getPreferences(user)).resolves.toMatchObject(expectedPreferences);
+	});
+
 	it('should update the current user', async () => {
 		const payload: UpdateUserDto = {
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
@@ -81,7 +96,6 @@ describe('UserController', () => {
 			password: await hash(payload.password, configService.get<number>('api.saltRounds')),
 		};
 
-		usersService.getById = jest.fn().mockResolvedValue(user);
 		usersService.update = jest.fn().mockResolvedValue(expectedUser);
 		await expect(userController.update(user, payload)).resolves.toMatchObject(new UserRo(expectedUser));
 	});
@@ -102,6 +116,49 @@ describe('UserController', () => {
 
 		usersService.update = jest.fn().mockRejectedValue(new Error());
 		await expect(userController.update(user, payload)).rejects.toThrow(Error);
+	});
+
+	it("should update the current user's newsletter preference", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: true,
+			userId: user.id,
+		};
+
+		usersService.updatePreferences = jest.fn().mockResolvedValue(expectedPreferences);
+		await expect(userController.updatePreferences(user, payload)).resolves.toMatchObject(
+			new UserPreferencesRo(expectedPreferences),
+		);
+	});
+
+	it("should not update the current user's newsletter preference if the user is already subscribed", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+
+		usersService.updatePreferences = jest.fn().mockRejectedValue(new SubscriberNotFoundException());
+		await expect(userController.updatePreferences(user, payload)).rejects.toThrow(NotFoundException);
+	});
+
+	it("should not update the current user's newsletter preference if the user is not subscribed", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+
+		usersService.updatePreferences = jest.fn().mockRejectedValue(new SubscriberConflictException());
+		await expect(userController.updatePreferences(user, payload)).rejects.toThrow(ConflictException);
+	});
+
+	it("should not update the current user's newsletter preference when an error occurs", async () => {
+		const payload: UpdateUserPreferencesDto = {
+			newsletter: true,
+		};
+
+		usersService.updatePreferences = jest.fn().mockRejectedValue(new Error());
+		await expect(userController.updatePreferences(user, payload)).rejects.toThrow(Error);
 	});
 
 	it('should delete the current user', async () => {

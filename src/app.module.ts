@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 
-import { AuthModule } from './auth';
-import { ConfigModule } from './config';
-import { ContactModule } from './contact';
-import { EmailModule } from './email';
-import { EmailConfirmationModule } from './email-confirmation';
-import { LoggerModule } from './logger';
-import { PostgresModule } from './postgres';
-import { RedisModule } from './redis';
-import { ResetPasswordModule } from './reset-password';
-import { SessionModule } from './session';
-import { UsersModule } from './users';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from './config/config.module';
+import { ContactModule } from './contact/contact.module';
+import { EmailModule } from './email/email.module';
+import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
+import { LoggerModule } from './logger/logger.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
+import { PostgresModule } from './postgres/postgres.module';
+import { RedisModule } from './redis/redis.module';
+import { ResetPasswordModule } from './reset-password/reset-password.module';
+import { SessionModule } from './session/session.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
 	imports: [
@@ -20,6 +21,7 @@ import { UsersModule } from './users';
 		EmailModule,
 		EmailConfirmationModule,
 		LoggerModule,
+		NewsletterModule,
 		PostgresModule,
 		RedisModule,
 		ResetPasswordModule,

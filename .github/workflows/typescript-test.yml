@@ -21,8 +21,12 @@ jobs:
       API_EMAIL_SENDER_EMAIL: noreply@datadvisor.me
       API_EMAIL_CONFIRMATION_JWT_SECRET: ${{ secrets.API_EMAIL_CONFIRMATION_JWT_SECRET }}
       API_FRONTEND_URL: https://datadvisor.me
+      API_NEWSLETTER_LIST_ID: 7c719335b9
       API_RESET_PASSWORD_JWT_SECRET: ${{ secrets.API_RESET_PASSWORD_JWT_SECRET }}
       API_SESSION_SECRET: ${{ secrets.API_SESSION_SECRET }}
+
+      MAILCHIMP_API_SERVER: us10
+      MAILCHIMP_API_KEY: ${{ secrets.MAILCHIMP_API_KEY }}
 
       POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/datadvisor?schema=api
 

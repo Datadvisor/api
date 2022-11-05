@@ -1,35 +1,67 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 
-import { PostgresService } from '../postgres';
-import { CreateUserDto, UpdateUserDto } from './dto';
-import { User, Role } from './entities';
-import { UserNotFoundException, UserConflictException } from './exceptions';
-import { EmailConfirmationService } from '../email-confirmation';
+import { EmailConfirmationService } from '../email-confirmation/email-confirmation.service';
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { NewsletterService } from '../newsletter/newsletter.service';
+import { PostgresService } from '../postgres/postgres.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Preferences, Role, User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
 
 @Injectable()
 export class UsersService {
+	private readonly logger = new Logger(UsersService.name);
+
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly postgresService: PostgresService,
 		@Inject(forwardRef(() => EmailConfirmationService))
 		private readonly emailConfirmationService: EmailConfirmationService,
+		private readonly newsletterService: NewsletterService,
 	) {}
 
 	async create(payload: CreateUserDto): Promise<User> {
-		const { email, password } = payload;
+		const { lastName, firstName, email, password, newsletter } = payload;
 		const hashedPassword = await hash(password, this.configService.get<number>('api.saltRounds'));
 
 		if (await this.postgresService.user.findUnique({ where: { email } })) {
 			throw new UserConflictException('Email address already associated to another user account');
 		}
 
-		const user = await this.postgresService.user.create({ data: { ...payload, password: hashedPassword } });
+		const user = await this.postgresService.user.create({
+			data: {
+				lastName,
+				firstName,
+				email,
+				password: hashedPassword,
+				preferences: {
+					create: {
+						newsletter: false,
+					},
+				},
+			},
+		});
+
+		try {
+			if (newsletter) {
+				await this.updatePreferences(user.id, { newsletter: true });
+			}
+		} catch (err) {
+			if (!(err instanceof SubscriberConflictException)) {
+				this.logger.error(err.message);
+			}
+		}
 
 		try {
 			await this.emailConfirmationService.send(user);
-		} catch (err) {}
+		} catch (err) {
+			this.logger.error(err.message);
+		}
 		return user;
 	}
 
@@ -53,6 +85,17 @@ export class UsersService {
 			throw new UserNotFoundException('User not found');
 		}
 		return user;
+	}
+
+	async getPreferences(userId: string): Promise<Preferences | null> {
+		const user = await this.postgresService.user.findUnique({ where: { id: userId } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+		return this.postgresService.preferences.findUnique({
+			where: { userId },
+		});
 	}
 
 	async update(id: string, payload: UpdateUserDto): Promise<User | null> {
@@ -83,6 +126,28 @@ export class UsersService {
 		return this.postgresService.user.update({
 			data: { role },
 			where: { id },
+		});
+	}
+
+	async updatePreferences(userId: string, payload: UpdateUserPreferencesDto): Promise<Preferences | null> {
+		const user = await this.postgresService.user.findUnique({
+			where: { id: userId },
+		});
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+
+		if (payload.newsletter !== undefined) {
+			if (payload.newsletter) {
+				await this.newsletterService.subscribe(user.email);
+			} else {
+				await this.newsletterService.unsubscribe(user.email);
+			}
+		}
+		return this.postgresService.preferences.update({
+			where: { userId },
+			data: payload,
 		});
 	}
 

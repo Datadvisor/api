@@ -1,6 +1,7 @@
 import { applyDecorators, CustomDecorator, SetMetadata, UseGuards } from '@nestjs/common';
 
-import { AuthOwnerGuard, AuthUserGuard } from '../guards';
+import { AuthOwnerGuard } from '../guards/auth-owner.guard';
+import { AuthUserGuard } from '../guards/auth-user.guard';
 
 const SelfLocation = (self: string): CustomDecorator => SetMetadata('self', self);
 

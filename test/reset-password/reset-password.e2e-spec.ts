@@ -1,19 +1,23 @@
+import { faker } from '@faker-js/faker/locale/en';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { faker } from '@faker-js/faker/locale/en';
 import * as request from 'supertest';
 
-import { PostgresModule, PostgresService } from '../../src/postgres';
-import { SeederModule, SeederService } from '../../src/seeder';
-import { UsersService } from '../../src/users';
-import { Role, User } from '../../src/users/entities';
-import { AuthModule } from '../../src/auth';
-import { ConfigModule } from '../../src/config';
-import { ResetPasswordModule, ResetPasswordTokenPayloadType } from '../../src/reset-password';
-import { SessionModule } from '../../src/session';
-import { ResetPasswordDto, SendResetPasswordEmailDto } from '../../src/reset-password/dto';
+import { AuthModule } from '../../src/auth/auth.module';
+import { ConfigModule } from '../../src/config/config.module';
+import { PostgresModule } from '../../src/postgres/postgres.module';
+import { PostgresService } from '../../src/postgres/postgres.service';
+import { ResetPasswordDto } from '../../src/reset-password/dto/reset-password.dto';
+import { SendResetPasswordEmailDto } from '../../src/reset-password/dto/send-reset-password-email.dto';
+import { ResetPasswordModule } from '../../src/reset-password/reset-password.module';
+import { ResetPasswordTokenPayloadType } from '../../src/reset-password/reset-password.type';
+import { SeederModule } from '../../src/seeder/seeder.module';
+import { SeederService } from '../../src/seeder/seeder.service';
+import { SessionModule } from '../../src/session/session.module';
+import { Role, User } from '../../src/users/entities/user.entity';
+import { UsersService } from '../../src/users/users.service';
 
 describe('ResetPassword', () => {
 	let app: INestApplication;

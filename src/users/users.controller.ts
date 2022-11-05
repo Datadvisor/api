@@ -1,16 +1,16 @@
 import {
-	Controller,
-	Get,
 	Body,
-	Patch,
-	Param,
+	ClassSerializerInterceptor,
+	ConflictException,
+	Controller,
 	Delete,
+	Get,
 	HttpCode,
 	HttpStatus,
 	NotFoundException,
-	ConflictException,
+	Param,
+	Patch,
 	UseInterceptors,
-	ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -25,12 +25,18 @@ import {
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { AuthOwner } from '../auth/decorators/auth-owner.decorator';
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Role } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserRo } from './ro/user.ro';
+import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UsersService } from './users.service';
-import { AuthOwner, AuthUser } from '../auth/decorators';
-import { UserRo } from './ro';
-import { Role } from './entities';
-import { UserConflictException, UserNotFoundException } from './exceptions';
-import { UpdateUserDto } from './dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -72,6 +78,26 @@ export class UsersController {
 		}
 	}
 
+	@ApiOperation({ summary: "Get user's preferences" })
+	@ApiOkResponse({ description: 'Success' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
+	@ApiNotFoundResponse({ description: 'Not found' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Get(':id/preferences')
+	@AuthOwner()
+	@HttpCode(HttpStatus.OK)
+	async getPreferences(@Param('id') userId: string): Promise<UserPreferencesRo | null> {
+		try {
+			return new UserPreferencesRo(await this.usersService.getPreferences(userId));
+		} catch (err) {
+			if (err instanceof UserNotFoundException) {
+				throw new NotFoundException(err.message);
+			}
+			throw err;
+		}
+	}
+
 	@ApiOperation({ summary: 'Update a user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
 	@ApiBadRequestResponse({ description: 'Bad request' })
@@ -90,6 +116,32 @@ export class UsersController {
 			if (err instanceof UserNotFoundException) {
 				throw new NotFoundException(err.message);
 			} else if (err instanceof UserConflictException) {
+				throw new ConflictException(err.message);
+			}
+			throw err;
+		}
+	}
+
+	@ApiOperation({ summary: "Update user's preferences" })
+	@ApiOkResponse({ description: 'Success' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiForbiddenResponse({ description: 'Forbidden' })
+	@ApiNotFoundResponse({ description: 'Not found' })
+	@ApiConflictResponse({ description: 'Conflict' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Patch(':id/preferences')
+	@AuthOwner()
+	@HttpCode(HttpStatus.OK)
+	async updatePreferences(
+		@Param('id') userId: string,
+		@Body() payload: UpdateUserPreferencesDto,
+	): Promise<UserPreferencesRo | null> {
+		try {
+			return new UserPreferencesRo(await this.usersService.updatePreferences(userId, payload));
+		} catch (err) {
+			if (err instanceof UserNotFoundException || err instanceof SubscriberNotFoundException) {
+				throw new NotFoundException(err.message);
+			} else if (err instanceof SubscriberConflictException) {
 				throw new ConflictException(err.message);
 			}
 			throw err;
