@@ -1,13 +1,13 @@
-import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as morgan from 'morgan';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppModule } from './app.module';
-import { PostgresService } from './postgres';
-import { doc } from './doc';
+import { doc } from './doc/doc';
+import { PostgresService } from './postgres/postgres.service';
 
 async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule);
@@ -48,4 +48,4 @@ async function bootstrap(): Promise<void> {
 	});
 }
 
-void bootstrap();
+bootstrap();

@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker/locale/en';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { faker } from '@faker-js/faker/locale/en';
 
-import { ConfigModule } from '../../src/config';
-import { ContactModule } from '../../src/contact';
-import { SendContactEmailDto } from '../../src/contact/dto';
+import { ConfigModule } from '../../src/config/config.module';
+import { ContactModule } from '../../src/contact/contact.module';
+import { SendContactEmailDto } from '../../src/contact/dto/send-contact-email.dto';
 
 describe('Contact', () => {
 	let app: INestApplication;

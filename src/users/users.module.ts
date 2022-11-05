@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { EmailConfirmationModule } from '../email-confirmation';
-import { NewsletterModule } from '../newsletter';
-import { PostgresModule } from '../postgres';
+import { EmailConfirmationModule } from '../email-confirmation/email-confirmation.module';
+import { NewsletterModule } from '../newsletter/newsletter.module';
+import { PostgresModule } from '../postgres/postgres.module';
 import { UserController } from './user.controller';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';

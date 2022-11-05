@@ -1,19 +1,22 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
+import { hash } from 'bcrypt';
 import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
-import { ConflictException, NotFoundException } from '@nestjs/common';
 
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Preferences, Role, User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserRo } from './ro/user.ro';
+import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { Role, User } from './entities';
-import { UserPreferencesRo, UserRo } from './ro';
-import { UserConflictException, UserNotFoundException } from './exceptions';
-import { UpdateUserDto, UpdateUserPreferencesDto } from './dto';
-import { hash } from 'bcrypt';
-import { Preferences } from '@prisma/client';
-import { SubscriberConflictException, SubscriberNotFoundException } from '../newsletter/exceptions';
 
 describe('UsersController', () => {
 	let usersController: UsersController;

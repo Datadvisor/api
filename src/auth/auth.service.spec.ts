@@ -1,16 +1,18 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
-import { faker } from '@faker-js/faker/locale/en';
+import { hash } from 'bcrypt';
 import * as cuid from 'cuid';
 
-import { hash } from 'bcrypt';
+import { Role, User } from '../users/entities/user.entity';
+import { UserConflictException } from '../users/exceptions/user-conflict.exception';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users';
-import { SigninDto, SignupDto } from './dto';
-import { Role, User } from '../users/entities';
-import { UnauthorizedAuthException } from './exceptions';
-import { UserConflictException, UserNotFoundException } from '../users/exceptions';
+import { SigninDto } from './dto/signin.dto';
+import { SignupDto } from './dto/signup.dto';
+import { UnauthorizedAuthException } from './exceptions/unauthorized-auth.exception';
 
 describe('AuthService', () => {
 	let authService: AuthService;

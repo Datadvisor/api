@@ -1,9 +1,10 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import * as mailchimp from '@mailchimp/mailchimp_marketing';
 import { AddListMemberBody } from '@mailchimp/mailchimp_marketing';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { SubscriberConflictException, SubscriberNotFoundException } from './exceptions';
+import { SubscriberConflictException } from './exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from './exceptions/subscriber-not-found.exception';
 
 @Injectable()
 export class NewsletterService {

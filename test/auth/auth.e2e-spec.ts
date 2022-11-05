@@ -1,17 +1,19 @@
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
-import { CookieMap } from 'set-cookie-parser';
-import { Test } from '@nestjs/testing';
 import { faker } from '@faker-js/faker/locale/en';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 import * as cuid from 'cuid';
+import { CookieMap } from 'set-cookie-parser';
+import * as setCookie from 'set-cookie-parser';
 import * as request from 'supertest';
 
-import * as setCookie from 'set-cookie-parser';
-import { User, Role } from '../../src/users/entities';
-import { AuthModule } from '../../src/auth';
-import { PostgresModule, PostgresService } from '../../src/postgres';
-import { ConfigModule } from '../../src/config';
-import { SessionModule } from '../../src/session';
-import { SigninDto, SignupDto } from '../../src/auth/dto';
+import { AuthModule } from '../../src/auth/auth.module';
+import { SigninDto } from '../../src/auth/dto/signin.dto';
+import { SignupDto } from '../../src/auth/dto/signup.dto';
+import { ConfigModule } from '../../src/config/config.module';
+import { PostgresModule } from '../../src/postgres/postgres.module';
+import { PostgresService } from '../../src/postgres/postgres.service';
+import { SessionModule } from '../../src/session/session.module';
+import { Role, User } from '../../src/users/entities/user.entity';
 
 describe('Auth', () => {
 	let app: INestApplication;

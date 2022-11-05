@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sendGrid from '@sendgrid/mail';
 
-import { SendEmailDto } from './dto';
+import { SendEmailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class EmailService {

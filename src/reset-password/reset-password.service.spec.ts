@@ -1,19 +1,20 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
-import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
 import { hash } from 'bcrypt';
+import * as cuid from 'cuid';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
+import { EmailService } from '../email/email.service';
+import { Role, User } from '../users/entities/user.entity';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
+import { UsersService } from '../users/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SendResetPasswordEmailDto } from './dto/send-reset-password-email.dto';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 import { ResetPasswordService } from './reset-password.service';
-import { EmailService } from '../email';
-import { UsersService } from '../users';
-import { ResetPasswordDto, SendResetPasswordEmailDto } from './dto';
-import { Role, User } from '../users/entities';
-import { UserNotFoundException } from '../users/exceptions';
-import { InvalidTokenException } from './exceptions';
 import { ResetPasswordTokenPayloadType } from './reset-password.type';
 
 describe('ResetPasswordService', () => {

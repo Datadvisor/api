@@ -1,16 +1,18 @@
-import { ConfigService } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
-import * as cuid from 'cuid';
 import { faker } from '@faker-js/faker/locale/en';
 import { createMock } from '@golevelup/ts-jest';
-
-import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, UpdateUserPreferencesDto } from './dto';
-import { PostgresService } from '../postgres';
-import { Role, User } from '../users/entities';
-import { UserConflictException, UserNotFoundException } from './exceptions';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { hash } from 'bcrypt';
-import { Preferences } from '@prisma/client';
+import * as cuid from 'cuid';
+
+import { PostgresService } from '../postgres/postgres.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Preferences, Role, User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UsersService } from './users.service';
 
 describe('UsersService', () => {
 	let usersService: UsersService;
@@ -93,8 +95,14 @@ describe('UsersService', () => {
 			...user,
 			password: await hash(user.password, configService.get<number>('api.saltRounds')),
 		};
+		const expectedPreferences: Preferences = {
+			id: cuid(),
+			newsletter: true,
+			userId: user.id,
+		};
 
 		postgresService.user.findUnique = jest.fn().mockResolvedValue(null);
+		usersService.updatePreferences = jest.fn().mockResolvedValue(expectedPreferences);
 		postgresService.user.create = jest.fn().mockResolvedValue(expectedUser);
 		await expect(usersService.create(payload)).resolves.toMatchObject(expectedUser);
 	});

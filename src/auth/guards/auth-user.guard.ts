@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { UsersService } from '../../users';
-import { ISession } from '../../session';
-import { UserNotFoundException } from '../../users/exceptions';
-import { Role } from '../../users/entities';
+import { ISession } from '../../session/session.type';
+import { Role } from '../../users/entities/user.entity';
+import { UserNotFoundException } from '../../users/exceptions/user-not-found.exception';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class AuthUserGuard implements CanActivate {

@@ -1,14 +1,4 @@
 import {
-	ApiBadRequestResponse,
-	ApiConflictResponse,
-	ApiGoneResponse,
-	ApiInternalServerErrorResponse,
-	ApiNoContentResponse,
-	ApiOperation,
-	ApiTags,
-	ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import {
 	BadRequestException,
 	ConflictException,
 	Controller,
@@ -18,13 +8,24 @@ import {
 	Param,
 	Post,
 } from '@nestjs/common';
+import {
+	ApiBadRequestResponse,
+	ApiConflictResponse,
+	ApiGoneResponse,
+	ApiInternalServerErrorResponse,
+	ApiNoContentResponse,
+	ApiOperation,
+	ApiTags,
+	ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { CurrentUser } from '../users/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
 import { EmailConfirmationService } from './email-confirmation.service';
-import { AuthUser } from '../auth/decorators';
-import { CurrentUser } from '../users/decorators';
-import { User } from '../users/entities';
-import { EmailAlreadyConfirmedException, InvalidTokenException } from './exceptions';
-import { UserNotFoundException } from '../users/exceptions';
+import { EmailAlreadyConfirmedException } from './exceptions/email-already-confirmed.exception.ts';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 
 @ApiTags('email-confirmation')
 @Controller('email-confirmation')

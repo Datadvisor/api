@@ -1,3 +1,4 @@
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,
@@ -5,12 +6,12 @@ import {
 	ApiOperation,
 	ApiTags,
 } from '@nestjs/swagger';
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SendResetPasswordEmailDto } from './dto/send-reset-password-email.dto';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 import { ResetPasswordService } from './reset-password.service';
-import { ResetPasswordDto, SendResetPasswordEmailDto } from './dto';
-import { UserNotFoundException } from '../users/exceptions';
-import { InvalidTokenException } from './exceptions';
 
 @ApiTags('reset-password')
 @Controller('reset-password')

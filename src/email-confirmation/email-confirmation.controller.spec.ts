@@ -1,16 +1,17 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { BadRequestException, ConflictException, GoneException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
-import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
 import { hash } from 'bcrypt';
-import { BadRequestException, ConflictException, GoneException } from '@nestjs/common';
+import * as cuid from 'cuid';
 
+import { Role, User } from '../users/entities/user.entity';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
 import { EmailConfirmationController } from './email-confirmation.controller';
 import { EmailConfirmationService } from './email-confirmation.service';
-import { Role, User } from '../users/entities';
-import { EmailAlreadyConfirmedException, InvalidTokenException } from './exceptions';
-import { UserNotFoundException } from '../users/exceptions';
+import { EmailAlreadyConfirmedException } from './exceptions/email-already-confirmed.exception.ts';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 
 describe('EmailConfirmationController', () => {
 	let emailConfirmationController: EmailConfirmationController;

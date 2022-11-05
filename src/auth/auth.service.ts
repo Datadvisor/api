@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
 
-import { UsersService } from '../users';
-import { SignupDto } from './dto';
-import { SigninDto } from './dto';
-import { User } from '../users/entities';
-import { UnauthorizedAuthException } from './exceptions';
+import { User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { SigninDto } from './dto/signin.dto';
+import { SignupDto } from './dto/signup.dto';
+import { UnauthorizedAuthException } from './exceptions/unauthorized-auth.exception';
 
 @Injectable()
 export class AuthService {
