@@ -79,7 +79,7 @@ export class UsersController {
 	}
 
 	@ApiOperation({ summary: "Get user's preferences" })
-	@ApiOkResponse({ description: 'Success' })
+	@ApiOkResponse({ description: 'Success', type: UserPreferencesRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiNotFoundResponse({ description: 'Not found' })
@@ -123,7 +123,7 @@ export class UsersController {
 	}
 
 	@ApiOperation({ summary: "Update user's preferences" })
-	@ApiOkResponse({ description: 'Success' })
+	@ApiOkResponse({ description: 'Success', type: UserPreferencesRo })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
 	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiNotFoundResponse({ description: 'Not found' })
