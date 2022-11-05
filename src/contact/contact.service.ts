@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import * as ejs from 'ejs';
 import * as path from 'path';
 
-import { EmailService } from '../email';
-import { SendContactEmailDto } from './dto';
+import { EmailService } from '../email/email.service';
+import { SendContactEmailDto } from './dto/send-contact-email.dto';
 
 @Injectable()
 export class ContactService {

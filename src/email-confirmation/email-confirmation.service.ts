@@ -1,15 +1,16 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import * as ejs from 'ejs';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import * as path from 'path';
 
-import { EmailService } from '../email';
-import { UsersService } from '../users';
-import { EmailAlreadyConfirmedException, InvalidTokenException } from './exceptions';
-import { User, Role } from '../users/entities';
+import { EmailService } from '../email/email.service';
+import { Role, User } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 import { EmailConfirmationTokenPayloadType } from './email-confirmation.type';
+import { EmailAlreadyConfirmedException } from './exceptions/email-already-confirmed.exception.ts';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 
 @Injectable()
 export class EmailConfirmationService {

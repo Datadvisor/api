@@ -1,19 +1,22 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
-import { CookieMap } from 'set-cookie-parser';
-import { Test } from '@nestjs/testing';
 import { faker } from '@faker-js/faker/locale/en';
-import * as request from 'supertest';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { CookieMap } from 'set-cookie-parser';
 import * as setCookie from 'set-cookie-parser';
+import * as request from 'supertest';
 
-import { PostgresModule, PostgresService } from '../../src/postgres';
-import { SeederModule, SeederService } from '../../src/seeder';
-import { AuthModule } from '../../src/auth';
-import { ConfigModule } from '../../src/config';
-import { SessionModule } from '../../src/session';
-import { UsersModule } from '../../src/users';
-import { SigninDto } from '../../src/auth/dto';
-import { UpdateUserDto, UpdateUserPreferencesDto } from '../../src/users/dto';
-import { Role, User } from '../../src/users/entities';
+import { AuthModule } from '../../src/auth/auth.module';
+import { SigninDto } from '../../src/auth/dto/signin.dto';
+import { ConfigModule } from '../../src/config/config.module';
+import { PostgresModule } from '../../src/postgres/postgres.module';
+import { PostgresService } from '../../src/postgres/postgres.service';
+import { SeederModule } from '../../src/seeder/seeder.module';
+import { SeederService } from '../../src/seeder/seeder.service';
+import { SessionModule } from '../../src/session/session.module';
+import { UpdateUserDto } from '../../src/users/dto/update-user.dto';
+import { UpdateUserPreferencesDto } from '../../src/users/dto/update-user-preferences.dto';
+import { Role, User } from '../../src/users/entities/user.entity';
+import { UsersModule } from '../../src/users/users.module';
 
 describe('User', () => {
 	let app: INestApplication;

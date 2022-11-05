@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
-import { EmailModule } from '../email';
-import { UsersModule } from '../users';
+import { EmailModule } from '../email/email.module';
+import { UsersModule } from '../users/users.module';
 import { ResetPasswordController } from './reset-password.controller';
 import { ResetPasswordService } from './reset-password.service';
 

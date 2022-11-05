@@ -1,11 +1,11 @@
+import { RedisService } from '@liaoliaots/nestjs-redis';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestSessionOptions, SessionModule as NestSessionModule } from 'nestjs-session';
-import { RedisService } from '@liaoliaots/nestjs-redis';
 import * as RedisStore from 'connect-redis';
 import * as session from 'express-session';
+import { NestSessionOptions, SessionModule as NestSessionModule } from 'nestjs-session';
 
-import { RedisModule } from '../redis';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
 	imports: [

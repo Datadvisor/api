@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
-import { User, Role } from '../entities';
+import { Role, User } from '../entities/user.entity';
 
 export class UserRo {
 	constructor(partial: Partial<User>) {

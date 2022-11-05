@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { WinstonModule, utilities as WinstonModuleUtilities } from 'nest-winston';
+import { utilities as WinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 
 const { transports, format } = winston;

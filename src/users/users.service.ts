@@ -2,13 +2,16 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcrypt';
 
-import { PostgresService } from '../postgres';
-import { CreateUserDto, UpdateUserDto, UpdateUserPreferencesDto } from './dto';
-import { User, Role, Preferences } from './entities';
-import { UserNotFoundException, UserConflictException } from './exceptions';
-import { EmailConfirmationService } from '../email-confirmation';
-import { SubscriberConflictException } from '../newsletter/exceptions';
-import { NewsletterService } from '../newsletter';
+import { EmailConfirmationService } from '../email-confirmation/email-confirmation.service';
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { NewsletterService } from '../newsletter/newsletter.service';
+import { PostgresService } from '../postgres/postgres.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Preferences, Role, User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
 
 @Injectable()
 export class UsersService {

@@ -54,7 +54,7 @@ export class PostgresService
 		const { schema } = url.parse(this.configService.get<string>('postgres.url'), true, true).query;
 
 		await this.$transaction([
-			...tables.map((table) => this.$executeRawUnsafe(`TRUNCATE TABLE \"${schema}\".\"${table}\" CASCADE;`)),
+			...tables.map((table) => this.$executeRawUnsafe(`TRUNCATE TABLE "${schema}"."${table}" CASCADE;`)),
 		]);
 	}
 

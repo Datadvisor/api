@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { createMock } from '@golevelup/ts-jest';
 import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import { EmailService } from '../email/email.service';
 import { ContactService } from './contact.service';
-import { EmailService } from '../email';
-import { SendContactEmailDto } from './dto';
+import { SendContactEmailDto } from './dto/send-contact-email.dto';
 
 describe('ContactService', () => {
 	let contactService: ContactService;

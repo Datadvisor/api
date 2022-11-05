@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
-import { Preferences } from '../entities';
+import { Preferences } from '../entities/user.entity';
 
 export class UserPreferencesRo {
 	constructor(partial: Partial<Preferences>) {

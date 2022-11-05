@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
 import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
-import { SendContactEmailDto } from './dto';
+import { SendContactEmailDto } from './dto/send-contact-email.dto';
 
 describe('ContactController', () => {
 	let contactController: ContactController;

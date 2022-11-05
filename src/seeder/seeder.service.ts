@@ -1,11 +1,11 @@
+import { faker } from '@faker-js/faker/locale/en';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
 import { hash } from 'bcrypt';
+import * as cuid from 'cuid';
 
-import { PostgresService } from '../postgres';
-import { Role, User } from '../users/entities';
+import { PostgresService } from '../postgres/postgres.service';
+import { Role, User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SeederService {

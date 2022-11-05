@@ -1,20 +1,23 @@
+import { faker } from '@faker-js/faker/locale/en';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { CookieMap } from 'set-cookie-parser';
 import { Test } from '@nestjs/testing';
-import * as request from 'supertest';
-import { faker } from '@faker-js/faker/locale/en';
+import { CookieMap } from 'set-cookie-parser';
 import * as setCookie from 'set-cookie-parser';
+import * as request from 'supertest';
 
-import { PostgresModule, PostgresService } from '../../src/postgres';
-import { SeederModule, SeederService } from '../../src/seeder';
-import { Role, User } from '../../src/users/entities';
-import { AuthModule } from '../../src/auth';
-import { ConfigModule } from '../../src/config';
-import { EmailConfirmationModule, EmailConfirmationTokenPayloadType } from '../../src/email-confirmation';
-import { SessionModule } from '../../src/session';
-import { SigninDto } from '../../src/auth/dto';
+import { AuthModule } from '../../src/auth/auth.module';
+import { SigninDto } from '../../src/auth/dto/signin.dto';
+import { ConfigModule } from '../../src/config/config.module';
+import { EmailConfirmationModule } from '../../src/email-confirmation/email-confirmation.module';
+import { EmailConfirmationTokenPayloadType } from '../../src/email-confirmation/email-confirmation.type';
+import { PostgresModule } from '../../src/postgres/postgres.module';
+import { PostgresService } from '../../src/postgres/postgres.service';
+import { SeederModule } from '../../src/seeder/seeder.module';
+import { SeederService } from '../../src/seeder/seeder.service';
+import { SessionModule } from '../../src/session/session.module';
+import { Role, User } from '../../src/users/entities/user.entity';
 
 describe('EmailConfirmation', () => {
 	let app: INestApplication;

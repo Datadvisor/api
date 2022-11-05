@@ -1,16 +1,16 @@
 import {
-	Controller,
-	Get,
 	Body,
-	Patch,
-	Param,
+	ClassSerializerInterceptor,
+	ConflictException,
+	Controller,
 	Delete,
+	Get,
 	HttpCode,
 	HttpStatus,
 	NotFoundException,
-	ConflictException,
+	Param,
+	Patch,
 	UseInterceptors,
-	ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
@@ -25,13 +25,18 @@ import {
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { AuthOwner } from '../auth/decorators/auth-owner.decorator';
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { Role } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserRo } from './ro/user.ro';
+import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UsersService } from './users.service';
-import { AuthOwner, AuthUser } from '../auth/decorators';
-import { UserPreferencesRo, UserRo } from './ro';
-import { Role } from './entities';
-import { UserConflictException, UserNotFoundException } from './exceptions';
-import { UpdateUserDto, UpdateUserPreferencesDto } from './dto';
-import { SubscriberConflictException, SubscriberNotFoundException } from '../newsletter/exceptions';
 
 @ApiTags('users')
 @Controller('users')

@@ -7,8 +7,8 @@ import {
 	ApiTags,
 } from '@nestjs/swagger';
 
-import { SendContactEmailDto } from './dto';
 import { ContactService } from './contact.service';
+import { SendContactEmailDto } from './dto/send-contact-email.dto';
 
 @ApiTags('contact')
 @Controller('contact')

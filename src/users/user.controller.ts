@@ -23,14 +23,18 @@ import {
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
+import { AuthUser } from '../auth/decorators/auth-user.decorator';
+import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
+import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
+import { User } from './entities/user.entity';
+import { UserConflictException } from './exceptions/user-conflict.exception';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserRo } from './ro/user.ro';
+import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UsersService } from './users.service';
-import { AuthUser } from '../auth/decorators';
-import { CurrentUser } from './decorators';
-import { User } from './entities';
-import { UserPreferencesRo, UserRo } from './ro';
-import { UpdateUserDto, UpdateUserPreferencesDto } from './dto';
-import { UserConflictException, UserNotFoundException } from './exceptions';
-import { SubscriberConflictException, SubscriberNotFoundException } from '../newsletter/exceptions';
 
 @ApiTags('users')
 @Controller('user')

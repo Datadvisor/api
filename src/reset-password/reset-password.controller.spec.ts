@@ -1,17 +1,18 @@
+import { faker } from '@faker-js/faker/locale/en';
+import { createMock } from '@golevelup/ts-jest';
+import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createMock } from '@golevelup/ts-jest';
-import * as cuid from 'cuid';
-import { faker } from '@faker-js/faker/locale/en';
 import { hash } from 'bcrypt';
-import { BadRequestException } from '@nestjs/common';
+import * as cuid from 'cuid';
 
+import { Role, User } from '../users/entities/user.entity';
+import { UserNotFoundException } from '../users/exceptions/user-not-found.exception';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { SendResetPasswordEmailDto } from './dto/send-reset-password-email.dto';
+import { InvalidTokenException } from './exceptions/invalid-token.exception';
 import { ResetPasswordController } from './reset-password.controller';
 import { ResetPasswordService } from './reset-password.service';
-import { Role, User } from '../users/entities';
-import { ResetPasswordDto, SendResetPasswordEmailDto } from './dto';
-import { UserNotFoundException } from '../users/exceptions';
-import { InvalidTokenException } from './exceptions';
 
 describe('ResetPasswordController', () => {
 	let resetPasswordController: ResetPasswordController;
