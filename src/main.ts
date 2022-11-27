@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
 
 	app.enableCors({ credentials: true, origin: corsOrigins });
 
-	app.useGlobalPipes(new ValidationPipe({ transform: true }));
+	app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
 	SwaggerModule.setup('doc', app, SwaggerModule.createDocument(app, doc));
 
