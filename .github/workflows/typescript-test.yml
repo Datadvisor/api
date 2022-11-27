@@ -32,6 +32,8 @@ jobs:
 
       REDIS_URL: redis://:${{ secrets.REDIS_PASSWORD }}@localhost:6379/0
 
+      SCRAPPER_URL: localhost:8002
+
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
     services:
