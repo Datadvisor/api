@@ -23,7 +23,7 @@ export class EmailConfirmationService {
 	) {}
 
 	async send(user: User): Promise<void> {
-		if (user.role !== Role.UNCONFIRMED_USER) {
+		if (user.emailVerified) {
 			throw new EmailAlreadyConfirmedException('Email already confirmed');
 		}
 
@@ -50,10 +50,10 @@ export class EmailConfirmationService {
 			const { email } = await this.jwtService.verifyAsync<EmailConfirmationTokenPayloadType>(token);
 			const user = await this.usersService.getByEmail(email);
 
-			if (user.role !== Role.UNCONFIRMED_USER) {
+			if (user.emailVerified) {
 				throw new EmailAlreadyConfirmedException('Email already confirmed');
 			}
-			await this.usersService.updateRole(user.id, Role.USER);
+			await this.usersService.updateEmailVerified(user.id, true);
 		} catch (err) {
 			if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {
 				throw new InvalidTokenException('Invalid or expired token');

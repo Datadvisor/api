@@ -57,6 +57,7 @@ describe('UserController', () => {
 			lastName: faker.name.lastName(),
 			firstName: faker.name.firstName(),
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			emailVerified: true,
 			password: await hash(faker.internet.password(8), configService.get<number>('api.saltRounds')),
 			role: Role.USER,
 			createdAt: faker.date.past(),
