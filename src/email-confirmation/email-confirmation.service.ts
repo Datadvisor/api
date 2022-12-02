@@ -6,7 +6,7 @@ import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import * as path from 'path';
 
 import { EmailService } from '../email/email.service';
-import { Role, User } from '../users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { EmailConfirmationTokenPayloadType } from './email-confirmation.type';
 import { EmailAlreadyConfirmedException } from './exceptions/email-already-confirmed.exception.ts';
