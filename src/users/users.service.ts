@@ -129,6 +129,18 @@ export class UsersService {
 		});
 	}
 
+	async updateEmailVerified(id: string, verified: boolean): Promise<User | null> {
+		const user = await this.postgresService.user.findUnique({ where: { id } });
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+		return this.postgresService.user.update({
+			data: { emailVerified: verified },
+			where: { id },
+		});
+	}
+
 	async updatePreferences(userId: string, payload: UpdateUserPreferencesDto): Promise<Preferences | null> {
 		const user = await this.postgresService.user.findUnique({
 			where: { id: userId },

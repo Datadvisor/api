@@ -64,7 +64,8 @@ describe('EmailConfirmationService', () => {
 			firstName: faker.name.firstName(),
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
 			password: await hash(faker.internet.password(8), configService.get<number>('api.saltRounds')),
-			role: Role.UNCONFIRMED_USER,
+			emailVerified: false,
+			role: Role.USER,
 			createdAt: faker.date.past(),
 			updatedAt: faker.date.past(),
 		};
@@ -85,7 +86,7 @@ describe('EmailConfirmationService', () => {
 	});
 
 	it('should not send a confirmation email to an already confirmed user', async () => {
-		const expectedUser: User = { ...user, role: Role.USER };
+		const expectedUser: User = { ...user, emailVerified: true };
 
 		await expect(emailConfirmationService.send(expectedUser)).rejects.toThrow(EmailAlreadyConfirmedException);
 	});
@@ -94,7 +95,7 @@ describe('EmailConfirmationService', () => {
 		const token =
 			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
 		const payload: EmailConfirmationTokenPayloadType = { email: 'john@datadvisor.me' };
-		const expectedUser: User = { ...user, role: Role.USER };
+		const expectedUser: User = { ...user, emailVerified: true };
 
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
@@ -106,7 +107,7 @@ describe('EmailConfirmationService', () => {
 		const token =
 			'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZGF0YWR2aXNvci5tZSIsImlhdCI6MTY2MzQ0Mjk1NCwiZXhwIjoxNjYzNDQ2NTU0fQ.zjiN9lHFh__ZGdDx5VaWu5QplenTUq7mWEbrcOplPpo';
 		const payload: EmailConfirmationTokenPayloadType = { email: user.email };
-		const expectedUser: User = { ...user, role: Role.USER };
+		const expectedUser: User = { ...user, emailVerified: true };
 
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(expectedUser);

@@ -53,8 +53,9 @@ describe('EmailConfirmationController', () => {
 			lastName: faker.name.lastName(),
 			firstName: faker.name.firstName(),
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			emailVerified: true,
 			password: await hash(faker.internet.password(8), configService.get<number>('api.saltRounds')),
-			role: Role.UNCONFIRMED_USER,
+			role: Role.USER,
 			createdAt: faker.date.past(),
 			updatedAt: faker.date.past(),
 		};

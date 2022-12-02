@@ -20,6 +20,9 @@ export class UserRo {
 	@ApiProperty()
 	email: string;
 
+	@ApiProperty()
+	emailVerified: boolean;
+
 	@Exclude()
 	password: string;
 

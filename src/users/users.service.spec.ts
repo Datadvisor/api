@@ -53,6 +53,7 @@ describe('UsersService', () => {
 			lastName: faker.name.lastName(),
 			firstName: faker.name.firstName(),
 			email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+			emailVerified: true,
 			password: faker.internet.password(8),
 			role: Role.USER,
 			createdAt: faker.date.past(),

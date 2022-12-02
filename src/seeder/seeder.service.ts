@@ -20,6 +20,7 @@ export class SeederService {
 				lastName: faker.name.lastName(),
 				firstName: faker.name.firstName(),
 				email: faker.internet.email(undefined, undefined, 'datadvisor.me'),
+				emailVerified: false,
 				password: faker.internet.password(8),
 				role,
 				createdAt: faker.date.past(),

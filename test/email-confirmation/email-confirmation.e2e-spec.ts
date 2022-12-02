@@ -44,7 +44,7 @@ describe('EmailConfirmation', () => {
 	});
 
 	beforeAll(async () => {
-		users = await seederService.createUsers(1, Role.UNCONFIRMED_USER);
+		users = await seederService.createUsers(1, Role.USER);
 	});
 
 	beforeAll(async () => {
