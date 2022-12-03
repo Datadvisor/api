@@ -57,7 +57,8 @@ export interface GetByEmailResponse {
 }
 
 export interface GetByResumeRequest {
-  file: Uint8Array;
+  fileName: string;
+  fileContent: Uint8Array;
 }
 
 export interface GetByResumeResponse {
@@ -67,7 +68,8 @@ export interface GetByResumeResponse {
 export interface GetByFaceRequest {
   lastName: string;
   firstName: string;
-  file: Uint8Array;
+  fileName: string;
+  fileContent: Uint8Array;
 }
 
 export interface GetByFaceResponse {

@@ -93,12 +93,12 @@ export class ScrapperController {
 	async getByResume(
 		@UploadedFile(
 			new ParseFilePipe({
-				validators: [new MaxFileSizeValidator({ maxSize: 50000 }), new FileTypeValidator({ fileType: 'pdf' })],
+				validators: [new MaxFileSizeValidator({ maxSize: 500000 }), new FileTypeValidator({ fileType: 'pdf' })],
 			}),
 		)
 		file: Express.Multer.File,
 	): Promise<ScrapperResume> {
-		const payload: GetByResumeRequest = { file: file.buffer };
+		const payload: GetByResumeRequest = { fileName: file.originalname, fileContent: file.buffer };
 
 		return this.scrapperService.getByResume(payload);
 	}
@@ -121,7 +121,12 @@ export class ScrapperController {
 		)
 		file: Express.Multer.File,
 	): Promise<ScrapperFace[]> {
-		const payload: GetByFaceRequest = { lastName: user.lastName, firstName: user.firstName, file: file.buffer };
+		const payload: GetByFaceRequest = {
+			lastName: user.lastName,
+			firstName: user.firstName,
+			fileName: file.originalname,
+			fileContent: file.buffer,
+		};
 
 		return this.scrapperService.getByFace(payload);
 	}

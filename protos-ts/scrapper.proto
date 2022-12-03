@@ -61,7 +61,8 @@ message GetByEmailResponse {
 }
 
 message GetByResumeRequest {
-  bytes file = 1;
+  string fileName = 1;
+  bytes fileContent = 2;
 }
 
 message GetByResumeResponse {
@@ -71,7 +72,8 @@ message GetByResumeResponse {
 message GetByFaceRequest {
   string lastName = 1;
   string firstName = 2;
-  bytes file = 3;
+  string fileName = 3;
+  bytes fileContent = 4;
 }
 
 message GetByFaceResponse {
