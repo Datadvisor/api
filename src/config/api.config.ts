@@ -7,8 +7,8 @@ export const apiConfig = registerAs('api', () => ({
 	env: env.get('NODE_ENV').required(true).asString(),
 	saltRounds: env.get('API_SALT_ROUNDS').default(10).asIntPositive(),
 	cors: {
-		origins: env.get('API_CORS_ORIGINS').default(['*']).asArray(),
-		headers: env.get('API_CORS_HEADERS').default(['*']).asArray(),
+		origins: env.get('API_CORS_ORIGINS').default('*').asArray(),
+		headers: env.get('API_CORS_HEADERS').default('*').asArray(),
 	},
 	contact: {
 		emailTemplatePath: env
