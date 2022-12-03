@@ -28,11 +28,12 @@ import { SubscriberConflictException } from '../newsletter/exceptions/subscriber
 import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserActivitiesReportPreferencesDto } from './dto/update-user-activities-report-preferences.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { User } from './entities/user.entity';
 import { UserConflictException } from './exceptions/user-conflict.exception';
-import { UserNotFoundException } from './exceptions/user-not-found.exception';
 import { UserRo } from './ro/user.ro';
+import { UserActivitiesReportPreferencesRo } from './ro/user-activities-report-preferences.ro';
 import { UserPreferencesRo } from './ro/user-preferences.ro';
 import { UsersService } from './users.service';
 
@@ -63,6 +64,18 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	async getPreferences(@CurrentUser() user: User): Promise<UserPreferencesRo | null> {
 		return new UserPreferencesRo(await this.usersService.getPreferences(user.id));
+	}
+
+	@ApiOperation({ summary: "Get the current user's activities report preferences" })
+	@ApiOkResponse({ description: 'Success', type: UserActivitiesReportPreferencesRo })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiNotFoundResponse({ description: 'Not found' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Get('/preferences/activities-report')
+	@AuthUser()
+	@HttpCode(HttpStatus.OK)
+	async getActivitiesReportPreferences(@CurrentUser() user: User): Promise<UserActivitiesReportPreferencesRo | null> {
+		return new UserActivitiesReportPreferencesRo(await this.usersService.getPreferences(user.id));
 	}
 
 	@ApiOperation({ summary: 'Update the current user' })
@@ -101,13 +114,27 @@ export class UserController {
 		try {
 			return new UserPreferencesRo(await this.usersService.updatePreferences(user.id, payload));
 		} catch (err) {
-			if (err instanceof UserNotFoundException || err instanceof SubscriberNotFoundException) {
+			if (err instanceof SubscriberNotFoundException) {
 				throw new NotFoundException(err.message);
 			} else if (err instanceof SubscriberConflictException) {
 				throw new ConflictException(err.message);
 			}
 			throw err;
 		}
+	}
+
+	@ApiOperation({ summary: "Update the current user's activities report preferences" })
+	@ApiOkResponse({ description: 'Success', type: UserActivitiesReportPreferencesRo })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Patch('/preferences/activities-report')
+	@AuthUser()
+	@HttpCode(HttpStatus.OK)
+	async updateActivitiesReportPreferences(
+		@CurrentUser() user: User,
+		@Body() payload: UpdateUserActivitiesReportPreferencesDto,
+	): Promise<UserActivitiesReportPreferencesRo | null> {
+		return new UserActivitiesReportPreferencesRo(await this.usersService.updatePreferences(user.id, payload));
 	}
 
 	@ApiOperation({ summary: 'Delete the current user' })

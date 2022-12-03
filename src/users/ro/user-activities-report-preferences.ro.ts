@@ -3,7 +3,7 @@ import { Exclude } from 'class-transformer';
 
 import { Frequency, Preferences, Scrapper } from '../entities/user.entity';
 
-export class UserPreferencesRo {
+export class UserActivitiesReportPreferencesRo {
 	constructor(partial: Partial<Preferences>) {
 		Object.assign(this, partial);
 	}
@@ -12,18 +12,16 @@ export class UserPreferencesRo {
 	id: string;
 
 	@ApiProperty()
+	@Exclude()
 	newsletter: boolean;
 
 	@ApiProperty()
-	@Exclude()
 	activitiesReport: boolean;
 
 	@ApiProperty()
-	@Exclude()
 	activitiesReportFrequency: Frequency;
 
 	@ApiProperty()
-	@Exclude()
 	activitiesReportScrapper: Scrapper;
 
 	@Exclude()

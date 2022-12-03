@@ -1,3 +1,3 @@
-import { Preferences, Role, User } from '@prisma/client';
+import { Frequency, Preferences, Role, Scrapper, User } from '@prisma/client';
 
-export { Preferences, Role, User };
+export { Frequency, Preferences, Role, Scrapper, User };
