@@ -27,10 +27,9 @@ async function bootstrap(): Promise<void> {
 
 	await postgresService.enableShutdownHooks(app);
 
-	const corsHeaders = configService.get<string[]>('api.cors.headers');
 	const corsOrigins = configService.get<string[]>('api.cors.origins');
 
-	app.enableCors({ credentials: true, allowedHeaders: corsHeaders, origin: corsOrigins });
+	app.enableCors({ credentials: true, origin: corsOrigins });
 
 	app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
@@ -42,7 +41,6 @@ async function bootstrap(): Promise<void> {
 	const appLogger = new Logger('Main');
 
 	await app.listen(port, host, () => {
-		appLogger.verbose(`Allowed CORS headers: ${corsHeaders}`);
 		appLogger.verbose(`Allowed CORS origins: ${corsOrigins}`);
 		appLogger.log(`Server listening on http://${host}:${port}`);
 	});
