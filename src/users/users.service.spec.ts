@@ -9,7 +9,7 @@ import { PostgresService } from '../postgres/postgres.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
-import { Preferences, Role, User } from './entities/user.entity';
+import { Frequency, Preferences, Role, Scrapper, User } from './entities/user.entity';
 import { UserConflictException } from './exceptions/user-conflict.exception';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
 import { UsersService } from './users.service';
@@ -99,6 +99,9 @@ describe('UsersService', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: true,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 
@@ -168,6 +171,9 @@ describe('UsersService', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: false,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 
@@ -261,6 +267,9 @@ describe('UsersService', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: true,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 
@@ -276,6 +285,9 @@ describe('UsersService', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: false,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 
