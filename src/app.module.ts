@@ -10,6 +10,7 @@ import { NewsletterModule } from './newsletter/newsletter.module';
 import { PostgresModule } from './postgres/postgres.module';
 import { RedisModule } from './redis/redis.module';
 import { ResetPasswordModule } from './reset-password/reset-password.module';
+import { ScrapperModule } from './scrapper/scrapper.module';
 import { SessionModule } from './session/session.module';
 import { UsersModule } from './users/users.module';
 
@@ -27,6 +28,7 @@ import { UsersModule } from './users/users.module';
 		ResetPasswordModule,
 		SessionModule,
 		UsersModule,
+		ScrapperModule,
 	],
 })
 export class AppModule {}

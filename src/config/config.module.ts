@@ -5,6 +5,7 @@ import { apiConfig } from './api.config';
 import { mailchimpConfig } from './mailchimp.config';
 import { postgresConfig } from './postgres.config';
 import { redisConfig } from './redis.config';
+import { scrapperConfig } from './scrapper.config';
 import { sendgridConfig } from './sendgrid.config';
 
 @Module({
@@ -12,7 +13,7 @@ import { sendgridConfig } from './sendgrid.config';
 		NestConfigModule.forRoot({
 			cache: true,
 			isGlobal: true,
-			load: [apiConfig, mailchimpConfig, postgresConfig, redisConfig, sendgridConfig],
+			load: [apiConfig, mailchimpConfig, postgresConfig, redisConfig, scrapperConfig, sendgridConfig],
 		}),
 	],
 })

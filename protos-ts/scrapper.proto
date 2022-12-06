@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package scrapper;
+
+service ScrapperService {
+  rpc GetByName(GetByNameRequest) returns (GetByNameResponse);
+  rpc GetByEmail(GetByEmailRequest) returns (GetByEmailResponse);
+  rpc GetByResume(GetByResumeRequest) returns (GetByResumeResponse);
+  rpc GetByFace(GetByFaceRequest) returns (GetByFaceResponse);
+}
+
+message ScrapperName {
+  string name = 1;
+  string link = 2;
+  bool found = 3;
+  repeated ScrapperMetadata metadata = 4;
+}
+
+message ScrapperEmail {
+  bool has_password = 1;
+  string password = 2;
+  string sha1 = 3;
+  string hash = 4;
+  repeated string sources = 5;
+}
+
+message ScrapperResume {
+  repeated string emails = 1;
+  repeated string cities = 2;
+  repeated string addresses = 3;
+  repeated string phones = 4;
+  repeated string urls = 5;
+}
+
+message ScrapperFace {
+  string link = 1;
+  repeated ScrapperMetadata metadata = 4;
+}
+
+message ScrapperMetadata {
+  string name = 1;
+  string value = 2;
+}
+
+message GetByNameRequest {
+  string lastName = 1;
+  string firstName = 2;
+  bool demo = 3;
+}
+
+message GetByNameResponse {
+  repeated ScrapperName data = 1;
+}
+
+message GetByEmailRequest {
+  string email = 1;
+}
+
+message GetByEmailResponse {
+  repeated ScrapperEmail data = 1;
+}
+
+message GetByResumeRequest {
+  string fileName = 1;
+  bytes fileContent = 2;
+}
+
+message GetByResumeResponse {
+  ScrapperResume data = 1;
+}
+
+message GetByFaceRequest {
+  string lastName = 1;
+  string firstName = 2;
+  string fileName = 3;
+  bytes fileContent = 4;
+}
+
+message GetByFaceResponse {
+  repeated ScrapperFace data = 1;
+}

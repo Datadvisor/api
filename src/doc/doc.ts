@@ -8,5 +8,6 @@ export const doc = new DocumentBuilder()
 	.addTag('contact', 'Contact module')
 	.addTag('email-confirmation', 'Email confirmation module')
 	.addTag('reset-password', 'Reset password module')
+	.addTag('scrapper', 'Scrapper module')
 	.addTag('users', 'Users module')
 	.build();
