@@ -9,7 +9,7 @@ import { NewsletterService } from '../newsletter/newsletter.service';
 import { PostgresService } from '../postgres/postgres.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Frequency, Preferences, Role, Scrapper, User } from './entities/user.entity';
+import { Preferences, Role, User } from './entities/user.entity';
 import { UserConflictException } from './exceptions/user-conflict.exception';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
 
@@ -40,12 +40,7 @@ export class UsersService {
 				email,
 				password: hashedPassword,
 				preferences: {
-					create: {
-						newsletter: false,
-						activitiesReport: false,
-						activitiesReportFrequency: Frequency.MONTHLY,
-						activitiesReportScrapper: Scrapper.NAME,
-					},
+					create: {},
 				},
 			},
 		});
