@@ -15,22 +15,35 @@ enum Role {
   ADMIN
 }
 
+enum Frequency {
+  BI_MONTHLY
+  MONTHLY
+}
+
+enum Scrapper {
+  NAME
+  EMAIL
+}
+
 model Preferences {
-  id                String          @id @default(cuid())
-  newsletter        Boolean
-  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String          @unique
+  id                            String          @id @default(cuid())
+  newsletter                    Boolean         @default(false)
+  activitiesReport              Boolean         @default(false)
+  activitiesReportFrequency     Frequency?
+  activitiesReportScrapper      Scrapper?
+  user                          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                        String          @unique
 }
 
 model User {
-  id                String          @id @default(cuid())
-  lastName          String
-  firstName         String
-  email             String          @unique
-  emailVerified     Boolean          @default(false)
-  password          String?
-  role              Role            @default(USER)
-  preferences       Preferences?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id                            String          @id @default(cuid())
+  lastName                      String
+  firstName                     String
+  email                         String          @unique
+  emailVerified                 Boolean         @default(false)
+  password                      String?
+  role                          Role            @default(USER)
+  preferences                   Preferences?
+  createdAt                     DateTime        @default(now())
+  updatedAt                     DateTime        @updatedAt
 }

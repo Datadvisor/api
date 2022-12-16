@@ -10,7 +10,7 @@ import { SubscriberConflictException } from '../newsletter/exceptions/subscriber
 import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
-import { Preferences, Role, User } from './entities/user.entity';
+import { Frequency, Preferences, Role, Scrapper, User } from './entities/user.entity';
 import { UserConflictException } from './exceptions/user-conflict.exception';
 import { UserRo } from './ro/user.ro';
 import { UserPreferencesRo } from './ro/user-preferences.ro';
@@ -79,11 +79,16 @@ describe('UserController', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: false,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 
 		usersService.getPreferences = jest.fn().mockResolvedValue(expectedPreferences);
-		await expect(userController.getPreferences(user)).resolves.toMatchObject(expectedPreferences);
+		await expect(userController.getPreferences(user)).resolves.toMatchObject(
+			new UserPreferencesRo(expectedPreferences),
+		);
 	});
 
 	it('should update the current user', async () => {
@@ -126,6 +131,9 @@ describe('UserController', () => {
 		const expectedPreferences: Preferences = {
 			id: cuid(),
 			newsletter: true,
+			activitiesReport: false,
+			activitiesReportFrequency: Frequency.MONTHLY,
+			activitiesReportScrapper: Scrapper.NAME,
 			userId: user.id,
 		};
 

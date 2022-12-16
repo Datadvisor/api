@@ -5,7 +5,7 @@ import { hash } from 'bcrypt';
 import * as cuid from 'cuid';
 
 import { PostgresService } from '../postgres/postgres.service';
-import { Role, User } from '../users/entities/user.entity';
+import { Frequency, Role, Scrapper, User } from '../users/entities/user.entity';
 
 @Injectable()
 export class SeederService {
@@ -36,6 +36,9 @@ export class SeederService {
 					preferences: {
 						create: {
 							newsletter: false,
+							activitiesReport: false,
+							activitiesReportFrequency: Frequency.MONTHLY,
+							activitiesReportScrapper: Scrapper.NAME,
 						},
 					},
 				},
@@ -55,6 +58,9 @@ export class SeederService {
 				preferences: {
 					create: {
 						newsletter: false,
+						activitiesReport: false,
+						activitiesReportFrequency: Frequency.MONTHLY,
+						activitiesReportScrapper: Scrapper.NAME,
 					},
 				},
 			},
