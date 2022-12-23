@@ -13,6 +13,7 @@ import { ResetPasswordModule } from './reset-password/reset-password.module';
 import { ScrapperModule } from './scrapper/scrapper.module';
 import { SessionModule } from './session/session.module';
 import { UsersModule } from './users/users.module';
+import { WorkerModule } from './worker/worker.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import { UsersModule } from './users/users.module';
 		SessionModule,
 		UsersModule,
 		ScrapperModule,
+		WorkerModule,
 	],
 })
 export class AppModule {}

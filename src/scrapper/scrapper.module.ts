@@ -28,5 +28,6 @@ import { ScrapperService } from './scrapper.service';
 			inject: [ConfigService],
 		},
 	],
+	exports: [ScrapperService],
 })
 export class ScrapperModule {}
