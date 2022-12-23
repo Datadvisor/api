@@ -12,7 +12,7 @@ export const apiConfig = registerAs('api', () => ({
 	contact: {
 		emailTemplatePath: env
 			.get('API_CONTACT_EMAIL_TEMPLATE_PATH')
-			.default('../../views/contact-email.view.ejs')
+			.default('views/contact-email.view.ejs')
 			.asString(),
 		recipientEmail: env.get('API_CONTACT_RECIPIENT_EMAIL').required(true).asString(),
 	},
@@ -23,7 +23,7 @@ export const apiConfig = registerAs('api', () => ({
 	'email-confirmation': {
 		emailTemplatePath: env
 			.get('API_EMAIL_CONFIRMATION_EMAIL_TEMPLATE_PATH')
-			.default('../../views/email-confirmation-email.view.ejs')
+			.default('views/email-confirmation-email.view.ejs')
 			.asString(),
 		jwtSecret: env.get('API_EMAIL_CONFIRMATION_JWT_SECRET').required(true).asString(),
 		jwtExpirationTime: env.get('API_EMAIL_CONFIRMATION_JWT_EXPIRATION_TIME').default('60m').asString(),
@@ -41,7 +41,7 @@ export const apiConfig = registerAs('api', () => ({
 	'reset-password': {
 		emailTemplatePath: env
 			.get('API_RESET_PASSWORD_EMAIL_TEMPLATE_PATH')
-			.default('../../views/reset-password-email.view.ejs')
+			.default('views/reset-password-email.view.ejs')
 			.asString(),
 		jwtSecret: env.get('API_RESET_PASSWORD_JWT_SECRET').required(true).asString(),
 		jwtExpirationTime: env.get('API_RESET_PASSWORD_JWT_EXPIRATION_TIME').default('60m').asString(),
@@ -64,7 +64,7 @@ export const apiConfig = registerAs('api', () => ({
 				.asString(),
 			emailTemplatePath: env
 				.get('API_WORKER_ACTIVITIES_REPORT_EMAIL_TEMPLATE_PATH')
-				.default('../../worker/views/worker-activities-report-email.view.ejs')
+				.default('worker/views/worker-activities-report-email.view.ejs')
 				.asString(),
 		},
 	},
