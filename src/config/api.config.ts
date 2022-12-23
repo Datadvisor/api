@@ -52,4 +52,20 @@ export const apiConfig = registerAs('api', () => ({
 		httpOnly: env.get('API_SESSION_HTTP_ONLY').default('false').asBool(),
 		maxAge: env.get('API_SESSION_MAX_AGE').default(86400000).asIntPositive(),
 	},
+	worker: {
+		activitiesReport: {
+			monthlyCronSchedule: env
+				.get('API_WORKER_ACTIVITIES_REPORT_MONTHLY_CRON_SCHEDULE')
+				.default('*/2 * * * *')
+				.asString(),
+			bimonthlyCronSchedule: env
+				.get('API_WORKER_ACTIVITIES_REPORT_BIMONTHLY_CRON_SCHEDULE')
+				.default('*/2 * * * *')
+				.asString(),
+			emailTemplatePath: env
+				.get('API_WORKER_ACTIVITIES_REPORT_EMAIL_TEMPLATE_PATH')
+				.default('worker/views/worker-activities-report-email.view.ejs')
+				.asString(),
+		},
+	},
 }));
