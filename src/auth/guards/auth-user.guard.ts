@@ -42,6 +42,12 @@ export class AuthUserGuard implements CanActivate {
 			throw err;
 		}
 
+		const emailVerified = this.reflector.get<boolean>('emailVerified', ctx.getHandler());
+
+		if (emailVerified && !req.user.emailVerified) {
+			throw new ForbiddenException("You don't have permission to access to this resource");
+		}
+
 		const roles = this.reflector.get<Role[]>('roles', ctx.getHandler());
 
 		if (roles && roles.length && !AuthUserGuard.checkPermission(roles, req.user.role)) {
