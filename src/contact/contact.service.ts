@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as ejs from 'ejs';
-import * as path from 'path';
 
 import { EmailService } from '../email/email.service';
+import { relativeOrAbsolutePath } from '../utils/utils';
 import { SendContactEmailDto } from './dto/send-contact-email.dto';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class ContactService {
 
 	async send(payload: SendContactEmailDto): Promise<void> {
 		const html = await ejs.renderFile(
-			path.join(__dirname, this.configService.get<string>('api.contact.emailTemplatePath')),
+			relativeOrAbsolutePath(__dirname, this.configService.get<string>('api.contact.emailTemplatePath')),
 			payload,
 		);
 

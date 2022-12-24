@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as ejs from 'ejs';
 import * as cron from 'node-cron';
-import * as path from 'path';
 
 import { EmailService } from '../email/email.service';
 import { ScrapperService } from '../scrapper/scrapper.service';
 import { Frequency, Scrapper, User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { relativeOrAbsolutePath } from '../utils/utils';
 
 @Injectable()
 export class WorkerService {
@@ -64,7 +64,10 @@ export class WorkerService {
 		}
 
 		const html = await ejs.renderFile(
-			path.join(__dirname, this.configService.get<string>('api.worker.activitiesReport.emailTemplatePath')),
+			relativeOrAbsolutePath(
+				__dirname,
+				this.configService.get<string>('api.worker.activitiesReport.emailTemplatePath'),
+			),
 		);
 
 		await this.emailService.send({

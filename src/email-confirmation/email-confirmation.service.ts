@@ -3,11 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as ejs from 'ejs';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import * as path from 'path';
 
 import { EmailService } from '../email/email.service';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { relativeOrAbsolutePath } from '../utils/utils';
 import { EmailConfirmationTokenPayloadType } from './email-confirmation.type';
 import { EmailAlreadyConfirmedException } from './exceptions/email-already-confirmed.exception.ts';
 import { InvalidTokenException } from './exceptions/invalid-token.exception';
@@ -30,7 +30,10 @@ export class EmailConfirmationService {
 		const token = await this.jwtService.signAsync({ email: user.email });
 		const link = `${this.configService.get<string>('api.frontend.url')}/email-confirmation/verify?token=${token}`;
 		const html = await ejs.renderFile(
-			path.join(__dirname, this.configService.get<string>('api.email-confirmation.emailTemplatePath')),
+			relativeOrAbsolutePath(
+				__dirname,
+				this.configService.get<string>('api.email-confirmation.emailTemplatePath'),
+			),
 			{ email: user.email, link },
 		);
 
