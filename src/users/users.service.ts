@@ -1,6 +1,5 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
 import { hash } from 'bcrypt';
 
 import { EmailConfirmationService } from '../email-confirmation/email-confirmation.service';
@@ -9,6 +8,8 @@ import { NewsletterService } from '../newsletter/newsletter.service';
 import { PostgresService } from '../postgres/postgres.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserActivitiesReportPreferencesDto } from './dto/update-user-activities-report-preferences.dto';
+import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { Preferences, Role, User } from './entities/user.entity';
 import { UserConflictException } from './exceptions/user-conflict.exception';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
@@ -140,7 +141,7 @@ export class UsersService {
 		});
 	}
 
-	async updatePreferences(userId: string, payload: Prisma.PreferencesUpdateInput): Promise<Preferences | null> {
+	async updatePreferences(userId: string, payload: UpdateUserPreferencesDto): Promise<Preferences | null> {
 		const user = await this.postgresService.user.findUnique({
 			where: { id: userId },
 		});
@@ -156,6 +157,24 @@ export class UsersService {
 				await this.newsletterService.unsubscribe(user.email);
 			}
 		}
+		return this.postgresService.preferences.update({
+			where: { userId },
+			data: payload,
+		});
+	}
+
+	async updateActivitiesReportPreferences(
+		userId: string,
+		payload: UpdateUserActivitiesReportPreferencesDto,
+	): Promise<Preferences | null> {
+		const user = await this.postgresService.user.findUnique({
+			where: { id: userId },
+		});
+
+		if (!user) {
+			throw new UserNotFoundException('User not found');
+		}
+
 		return this.postgresService.preferences.update({
 			where: { userId },
 			data: payload,

@@ -99,7 +99,7 @@ describe('EmailConfirmationService', () => {
 
 		jwtService.verifyAsync = jest.fn().mockResolvedValue(payload);
 		usersService.getByEmail = jest.fn().mockResolvedValue(user);
-		usersService.updateRole = jest.fn().mockResolvedValue(expectedUser);
+		usersService.updateEmailVerified = jest.fn().mockResolvedValue(expectedUser);
 		await expect(emailConfirmationService.confirm(token)).resolves.toBe(undefined);
 	});
 

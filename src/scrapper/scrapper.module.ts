@@ -20,7 +20,7 @@ import { ScrapperService } from './scrapper.service';
 					transport: Transport.GRPC,
 					options: {
 						package: 'scrapper',
-						protoPath: `${__dirname}/../../protos/scrapper.proto`,
+						protoPath: `${__dirname}/../protos/scrapper.proto`,
 						url: configService.get<string>('scrapper.url'),
 					},
 				});

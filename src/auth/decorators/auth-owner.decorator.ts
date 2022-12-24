@@ -3,8 +3,14 @@ import { applyDecorators, CustomDecorator, SetMetadata, UseGuards } from '@nestj
 import { AuthOwnerGuard } from '../guards/auth-owner.guard';
 import { AuthUserGuard } from '../guards/auth-user.guard';
 
+const EmailVerified = (emailVerified: boolean): CustomDecorator => SetMetadata('emailVerified', emailVerified);
 const SelfLocation = (self: string): CustomDecorator => SetMetadata('self', self);
 
-export function AuthOwner(self = 'id') {
-	return applyDecorators(UseGuards(AuthUserGuard), SelfLocation(self), UseGuards(AuthOwnerGuard));
+export function AuthOwner(emailVerified = false, self = 'id') {
+	return applyDecorators(
+		EmailVerified(emailVerified),
+		UseGuards(AuthUserGuard),
+		SelfLocation(self),
+		UseGuards(AuthOwnerGuard),
+	);
 }

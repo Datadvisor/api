@@ -134,7 +134,9 @@ export class UserController {
 		@CurrentUser() user: User,
 		@Body() payload: UpdateUserActivitiesReportPreferencesDto,
 	): Promise<UserActivitiesReportPreferencesRo | null> {
-		return new UserActivitiesReportPreferencesRo(await this.usersService.updatePreferences(user.id, payload));
+		return new UserActivitiesReportPreferencesRo(
+			await this.usersService.updateActivitiesReportPreferences(user.id, payload),
+		);
 	}
 
 	@ApiOperation({ summary: 'Delete the current user' })

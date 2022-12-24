@@ -3,8 +3,9 @@ import { applyDecorators, CustomDecorator, SetMetadata, UseGuards } from '@nestj
 import { Role } from '../../users/entities/user.entity';
 import { AuthUserGuard } from '../guards/auth-user.guard';
 
+const EmailVerified = (emailVerified: boolean): CustomDecorator => SetMetadata('emailVerified', emailVerified);
 const Roles = (...roles: Role[]): CustomDecorator => SetMetadata('roles', roles);
 
-export function AuthUser(...roles: Role[]) {
-	return applyDecorators(Roles(...roles), UseGuards(AuthUserGuard));
+export function AuthUser(emailVerified = false, ...roles: Role[]) {
+	return applyDecorators(EmailVerified(emailVerified), Roles(...roles), UseGuards(AuthUserGuard));
 }

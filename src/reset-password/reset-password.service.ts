@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as ejs from 'ejs';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import * as path from 'path';
 
 import { EmailService } from '../email/email.service';
 import { UsersService } from '../users/users.service';
+import { relativeOrAbsolutePath } from '../utils/utils';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { SendResetPasswordEmailDto } from './dto/send-reset-password-email.dto';
 import { InvalidTokenException } from './exceptions/invalid-token.exception';
@@ -30,7 +30,7 @@ export class ResetPasswordService {
 		);
 		const link = `${this.configService.get<string>('api.frontend.url')}/reset-password/verify?token=${token}`;
 		const html = await ejs.renderFile(
-			path.join(__dirname, this.configService.get<string>('api.reset-password.emailTemplatePath')),
+			relativeOrAbsolutePath(__dirname, this.configService.get<string>('api.reset-password.emailTemplatePath')),
 			{ email, link },
 		);
 

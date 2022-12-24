@@ -52,7 +52,7 @@ export class UsersController {
 	@ApiForbiddenResponse({ description: 'Forbidden' })
 	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
 	@Get()
-	@AuthUser(Role.ADMIN)
+	@AuthUser(false, Role.ADMIN)
 	@HttpCode(HttpStatus.OK)
 	async getAll(): Promise<UserRo[]> {
 		const users = await this.usersService.getAll();
@@ -186,7 +186,9 @@ export class UsersController {
 		@Body() payload: UpdateUserActivitiesReportPreferencesDto,
 	): Promise<UserActivitiesReportPreferencesRo | null> {
 		try {
-			return new UserActivitiesReportPreferencesRo(await this.usersService.updatePreferences(userId, payload));
+			return new UserActivitiesReportPreferencesRo(
+				await this.usersService.updateActivitiesReportPreferences(userId, payload),
+			);
 		} catch (err) {
 			if (err instanceof UserNotFoundException || err instanceof SubscriberNotFoundException) {
 				throw new NotFoundException(err.message);
