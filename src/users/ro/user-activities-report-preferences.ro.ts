@@ -11,17 +11,16 @@ export class UserActivitiesReportPreferencesRo {
 	@ApiProperty()
 	id: string;
 
-	@ApiProperty()
 	@Exclude()
 	newsletter: boolean;
 
 	@ApiProperty()
 	activitiesReport: boolean;
 
-	@ApiProperty()
+	@ApiProperty({ enum: Frequency })
 	activitiesReportFrequency: Frequency;
 
-	@ApiProperty()
+	@ApiProperty({ enum: Scrapper })
 	activitiesReportScrapper: Scrapper;
 
 	@Exclude()

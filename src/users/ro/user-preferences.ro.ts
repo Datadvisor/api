@@ -14,15 +14,12 @@ export class UserPreferencesRo {
 	@ApiProperty()
 	newsletter: boolean;
 
-	@ApiProperty()
 	@Exclude()
 	activitiesReport: boolean;
 
-	@ApiProperty()
 	@Exclude()
 	activitiesReportFrequency: Frequency;
 
-	@ApiProperty()
 	@Exclude()
 	activitiesReportScrapper: Scrapper;
 
