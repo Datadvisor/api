@@ -38,7 +38,7 @@ jobs:
 
       API_STRIPE_PUBLISHABLE_API_KEY: ${{ secrets.API_STRIPE_PUBLISHABLE_API_KEY }}
 
-      API_STRIPE_SECRET_API_KEY: ${{ secrets.API_STRIPE_SECRET_API_KEY }}
+      API_STRIPE_PLAN_ID: ${{ secrets.API_STRIPE_PLAN_ID }}
 
     services:
       postgres:
