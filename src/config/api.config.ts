@@ -38,6 +38,10 @@ export const apiConfig = registerAs('api', () => ({
 	newsletter: {
 		listId: env.get('API_NEWSLETTER_LIST_ID').required(true).asString(),
 	},
+	stripe: {
+		publishableApiKey: env.get('API_STRIPE_PUBLISHABLE_API_KEY').required(true).asString(),
+		planId: env.get('API_STRIPE_PLAN_ID').required(true).asString(),
+	},
 	'reset-password': {
 		emailTemplatePath: env
 			.get('API_RESET_PASSWORD_EMAIL_TEMPLATE_PATH')

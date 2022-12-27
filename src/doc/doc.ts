@@ -10,4 +10,5 @@ export const doc = new DocumentBuilder()
 	.addTag('reset-password', 'Reset password module')
 	.addTag('scrapper', 'Scrapper module')
 	.addTag('users', 'Users module')
+	.addTag('payment', 'Payment module')
 	.build();
