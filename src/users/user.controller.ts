@@ -22,11 +22,16 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
 import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
+import { PostPaymentDetailsDto } from '../payment/dto/post-payment-details.dto';
+import { PaymentController } from '../payment/payment.controller';
+import { PaymentService } from '../payment/payment.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { SubscribeDto } from './dto/subscribe.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserActivitiesReportPreferencesDto } from './dto/update-user-activities-report-preferences.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
@@ -41,7 +46,7 @@ import { UsersService } from './users.service';
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(private readonly usersService: UsersService, private readonly paymentService: PaymentService) {}
 
 	@ApiOperation({ summary: 'Get the current user' })
 	@ApiOkResponse({ description: 'Success', type: UserRo })
@@ -90,6 +95,53 @@ export class UserController {
 	async update(@CurrentUser() user: User, @Body() payload: UpdateUserDto): Promise<UserRo | null> {
 		try {
 			return new UserRo(await this.usersService.update(user.id, payload));
+		} catch (err) {
+			if (err instanceof UserConflictException) {
+				throw new ConflictException(err.message);
+			}
+			throw err;
+		}
+	}
+
+	@ApiOperation({ summary: 'Make the current user be premium' })
+	@ApiOkResponse({ description: 'Success', type: UserRo })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiConflictResponse({ description: 'Conflict' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Patch('/premium/subscribe')
+	@AuthUser()
+	@HttpCode(HttpStatus.OK)
+	async setPremium(@CurrentUser() user: User, @Body() payload: SubscribeDto): Promise<UserRo | null> {
+		try {
+			await this.paymentService.initiatePaymentSession({
+				customer_email: user.email,
+				customer_card_number: payload.customer_card_number,
+				customer_card_exp_year: payload.customer_card_exp_year,
+				customer_card_exp_month: payload.customer_card_exp_month,
+				customer_card_cvc: payload.customer_card_cvc,
+			});
+			return new UserRo(await this.usersService.updateRole(user.id, Role.PREMIUM));
+		} catch (err) {
+			if (err instanceof UserConflictException) {
+				throw new ConflictException(err.message);
+			}
+			throw err;
+		}
+	}
+
+	@ApiOperation({ summary: 'Remove the premium status of the current user' })
+	@ApiOkResponse({ description: 'Success', type: UserRo })
+	@ApiBadRequestResponse({ description: 'Bad request' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized' })
+	@ApiConflictResponse({ description: 'Conflict' })
+	@ApiInternalServerErrorResponse({ description: 'Internal server error' })
+	@Patch('/premium/unsubscribe')
+	@AuthUser()
+	@HttpCode(HttpStatus.OK)
+	async unsetPremium(@CurrentUser() user: User): Promise<UserRo | null> {
+		try {
+			return new UserRo(await this.usersService.updateRole(user.id, Role.USER));
 		} catch (err) {
 			if (err instanceof UserConflictException) {
 				throw new ConflictException(err.message);
