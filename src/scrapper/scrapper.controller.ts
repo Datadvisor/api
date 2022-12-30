@@ -93,7 +93,10 @@ export class ScrapperController {
 	async getByResume(
 		@UploadedFile(
 			new ParseFilePipe({
-				validators: [new MaxFileSizeValidator({ maxSize: 500000 }), new FileTypeValidator({ fileType: 'pdf' })],
+				validators: [
+					new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+					new FileTypeValidator({ fileType: 'pdf' }),
+				],
 			}),
 		)
 		file: Express.Multer.File,
@@ -116,7 +119,11 @@ export class ScrapperController {
 		@CurrentUser() user: User,
 		@UploadedFile(
 			new ParseFilePipe({
-				validators: [new MaxFileSizeValidator({ maxSize: 50000 }), new FileTypeValidator({ fileType: 'jpeg' })],
+				validators: [
+					new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+					// eslint-disable-next-line prefer-regex-literals
+					new FileTypeValidator({ fileType: new RegExp(/\S+(.*?).(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/) }),
+				],
 			}),
 		)
 		file: Express.Multer.File,
