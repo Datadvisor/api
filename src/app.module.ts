@@ -7,6 +7,7 @@ import { EmailModule } from './email/email.module';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { LoggerModule } from './logger/logger.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
+import { PaymentModule } from './payment/payment.module';
 import { PostgresModule } from './postgres/postgres.module';
 import { RedisModule } from './redis/redis.module';
 import { ResetPasswordModule } from './reset-password/reset-password.module';
@@ -29,6 +30,7 @@ import { WorkerModule } from './worker/worker.module';
 		ResetPasswordModule,
 		SessionModule,
 		UsersModule,
+		PaymentModule,
 		ScrapperModule,
 		WorkerModule,
 	],
