@@ -27,8 +27,6 @@ import { Role } from '@prisma/client';
 import { AuthUser } from '../auth/decorators/auth-user.decorator';
 import { SubscriberConflictException } from '../newsletter/exceptions/subscriber-conflict.exception';
 import { SubscriberNotFoundException } from '../newsletter/exceptions/subscriber-not-found.exception';
-import { PostPaymentDetailsDto } from '../payment/dto/post-payment-details.dto';
-import { PaymentController } from '../payment/payment.controller';
 import { PaymentService } from '../payment/payment.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { SubscribeDto } from './dto/subscribe.dto';

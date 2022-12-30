@@ -1,14 +1,4 @@
-import {
-	Body,
-	ConflictException,
-	Controller,
-	HttpCode,
-	HttpStatus,
-	Injectable,
-	Post,
-	UnprocessableEntityException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Body, ConflictException, Controller, HttpCode, HttpStatus, Injectable, Post } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiInternalServerErrorResponse,

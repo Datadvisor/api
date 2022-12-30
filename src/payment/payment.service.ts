@@ -27,27 +27,21 @@ export class PaymentService {
 			};
 		},
 	): Promise<void> {
-		try {
-			this.stripe.customers
-				.create({
-					email: payload.customer_email,
-					source: token.id,
-				})
-				.then((customer) =>
-					this.stripe.subscriptions.create({
-						customer: customer.id,
-						items: [
-							{
-								plan: this.configService.get<string>('api.stripe.planId'),
-							},
-						],
-					}),
-				)
-				.then(() => console.log('success, subscription function there'))
-				.catch((err) => console.log(err));
-		} catch (err) {
-			console.log(`An error occured while processing the payment : ${err}`);
-		}
+		this.stripe.customers
+			.create({
+				email: payload.customer_email,
+				source: token.id,
+			})
+			.then((customer) =>
+				this.stripe.subscriptions.create({
+					customer: customer.id,
+					items: [
+						{
+							plan: this.configService.get<string>('api.stripe.planId'),
+						},
+					],
+				}),
+			);
 	}
 
 	async initiatePaymentSession(payload: PostPaymentDetailsDto): Promise<void> {
