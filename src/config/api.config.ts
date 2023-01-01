@@ -64,7 +64,7 @@ export const apiConfig = registerAs('api', () => ({
 				.asString(),
 			bimonthlyCronSchedule: env
 				.get('API_WORKER_ACTIVITIES_REPORT_BIMONTHLY_CRON_SCHEDULE')
-				.default('0 0 1 * *')
+				.default('0 0 15 * *')
 				.asString(),
 			emailTemplatePath: env
 				.get('API_WORKER_ACTIVITIES_REPORT_EMAIL_TEMPLATE_PATH')
