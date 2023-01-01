@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as ejs from 'ejs';
 import * as cron from 'node-cron';
@@ -11,6 +11,8 @@ import { relativeOrAbsolutePath } from '../utils/utils';
 
 @Injectable()
 export class WorkerService {
+	private readonly logger = new Logger(WorkerService.name);
+
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly emailService: EmailService,
@@ -30,6 +32,7 @@ export class WorkerService {
 				}
 				await this.sendActivitiesReport(user, preferences.activitiesReportScrapper);
 			});
+			this.logger.log('Activities reports successfully sent.');
 		});
 	}
 
@@ -80,7 +83,7 @@ export class WorkerService {
 			html,
 			attachments: [
 				{
-					content: btoa(JSON.stringify(res, null, 2)),
+					content: Buffer.from(JSON.stringify(res, null, 2), 'utf-8').toString('base64'),
 					filename: `Report-${user.firstName}.${user.lastName}-${new Date().toLocaleDateString()}.json`,
 					type: 'application/json',
 					disposition: 'attachment',
