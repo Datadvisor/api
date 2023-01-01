@@ -60,15 +60,15 @@ export const apiConfig = registerAs('api', () => ({
 		activitiesReport: {
 			monthlyCronSchedule: env
 				.get('API_WORKER_ACTIVITIES_REPORT_MONTHLY_CRON_SCHEDULE')
-				.default('*/2 * * * *')
+				.default('0 0 1 * *')
 				.asString(),
 			bimonthlyCronSchedule: env
 				.get('API_WORKER_ACTIVITIES_REPORT_BIMONTHLY_CRON_SCHEDULE')
-				.default('*/2 * * * *')
+				.default('0 0 1 * *')
 				.asString(),
 			emailTemplatePath: env
 				.get('API_WORKER_ACTIVITIES_REPORT_EMAIL_TEMPLATE_PATH')
-				.default('worker/views/worker-activities-report-email.view.ejs')
+				.default('views/worker-activities-report-email.view.ejs')
 				.asString(),
 		},
 	},
