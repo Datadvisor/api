@@ -32,7 +32,7 @@ export class WorkerService {
 				}
 				await this.sendActivitiesReport(user, preferences.activitiesReportScrapper);
 			});
-			this.logger.log('Activities reports successfully sent.');
+			this.logger.log('Monthly activities reports successfully sent.');
 		});
 	}
 
@@ -48,6 +48,7 @@ export class WorkerService {
 				}
 				await this.sendActivitiesReport(user, preferences.activitiesReportScrapper);
 			});
+			this.logger.log('Bi-monthly activities reports successfully sent.');
 		});
 	}
 
