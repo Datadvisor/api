@@ -55,6 +55,7 @@ export const apiConfig = registerAs('api', () => ({
 		secure: env.get('API_SESSION_SECURE').default('false').asBool(),
 		httpOnly: env.get('API_SESSION_HTTP_ONLY').default('false').asBool(),
 		maxAge: env.get('API_SESSION_MAX_AGE').default(86400000).asIntPositive(),
+		domain: env.get('API_SESSION_DOMAIN').default('').asString(),
 	},
 	worker: {
 		activitiesReport: {

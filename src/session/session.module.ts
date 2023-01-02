@@ -25,6 +25,7 @@ import { RedisModule } from '../redis/redis.module';
 							sameSite: false,
 							httpOnly: configService.get<boolean>('api.session.httpOnly'),
 							maxAge: configService.get<number>('api.session.maxAge'),
+							domain: configService.get<string>('api.session.domain'),
 						},
 					},
 				};
